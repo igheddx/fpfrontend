@@ -560,7 +560,7 @@ function RunPolicy() {
             key: "firstName",
         },
         {
-            title: "Last Name",
+            title: "Last Nam",
             dataIndex: "lastName",
             key: "lastName",
         },

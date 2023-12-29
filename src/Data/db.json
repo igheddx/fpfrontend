@@ -1,0 +1,27 @@
+
+{
+    "profile": [
+        {
+            "firstName": "Dominic",
+            "lastName": "Ighedosa",
+            "email": "dominic@me.com",
+            "profileUuid": "U*#JDEKDKDJ",
+            "password": "pass1234"
+        },
+        {
+            "firstName": "Awele",
+            "lastName": "Ighedosa",
+            "email": "awelec@me.com",
+            "profileUuid": "00001234",
+            "password": "pass1234"
+        },
+        {
+            "firstName": "Noah",
+            "lastName": "Ighedosa",
+            "email": "noah@me.com",
+            "profileUuid": "0000044400",
+            "password": "pass1234"
+        }
+    ]
+
+}

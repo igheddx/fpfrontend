@@ -1,0 +1,501 @@
+{
+  "profile": [
+    {
+      "firstName": "Dominic",
+      "lastName": "Ighedosa",
+      "email": "dominic@me.com",
+      "title": "VP of Engineering",
+      "username": "dominic@me.com",
+      "password": "pass1234",
+      "role": "superAdmin",
+      "profileUuid": "8a4e123e-a07d-4ff1-b145-392c1ad099d7",
+      "customerId": "1",
+      "accessToken": "",
+      "refreshToken": "",
+      "tokenIssuesAt": "08/5/2023",
+      "tokenExpiredAt": "08/5/2023",
+      "cloudAccountId": 2,
+      "status": "active",
+      "id": 2
+    },
+    {
+      "firstName": "Karl",
+      "lastName": "Jablonski",
+      "email": "karl@me.com",
+      "title": "VP Engineering",
+      "username": "karl@me.com",
+      "password": "pass1234",
+      "role": "approver",
+      "profileUuid": "d9dc9099-41c2-4747-98c9-1e79dfd62acd",
+      "customerId": "1",
+      "accessToken": "",
+      "refreshToken": "",
+      "tokenIssuesAt": "",
+      "tokenExpiredAt": "",
+      "cloudAccountId": "0",
+      "status": "active",
+      "id": 3
+    }
+  ],
+  "adminRole": [
+    {
+      "label": "Dashboard",
+      "key": "/",
+      "icon": "<DashboardOutlined />"
+    },
+    {
+      "label": "Run Policy",
+      "key": "/policy",
+      "icon": "<SyncOutlined />"
+    },
+    {
+      "label": "Approvals",
+      "key": "/approval",
+      "icon": "<CheckOutlined />"
+    },
+    {
+      "label": "Administration",
+      "key": "/admin",
+      "icon": "<ToolOutlined />"
+    },
+    {
+      "label": "Settings",
+      "key": "/settings",
+      "icon": "<SettingOutlined />"
+    },
+    {
+      "label": "Log Out",
+      "key": "/logout",
+      "icon": "<LogoutOutlined  />",
+      "danger": true
+    }
+  ],
+  "policyApprovalApprovers": [
+    {
+      "approvalId": 753,
+      "customerId": "1",
+      "policyId": 1,
+      "profileUuid": "d9dc9099-41c2-4747-98c9-1e79dfd62acd",
+      "firstName": "Karl",
+      "lastName": "Jablonski",
+      "title": "VP Engineering",
+      "status": "approve",
+      "isApproved": true,
+      "id": 1
+    }
+  ],
+  "policyApprovalHeader": [
+    {
+      "approvalId": 753,
+      "customerId": "1",
+      "policyId": 1,
+      "policyName": "Delete Orphan Resources",
+      "isApproved": true,
+      "state": "approved",
+      "submittedByName": "Dominic Ighedosa",
+      "submittedDateTime": "11/25/2023, 5:26:32 PM",
+      "submittedByProfileUuid": "8a4e123e-a07d-4ff1-b145-392c1ad099d7",
+      "affectedResources": [
+        {
+          "resourceId": 1000,
+          "resourceName": "ip-10-00.30-0.ec2.internal",
+          "instantType": "EC2"
+        },
+        {
+          "resourceId": 1001,
+          "resourceName": "ip-10-01.30-0.ec2.internal",
+          "instantType": "EC2"
+        }
+      ],
+      "id": 1
+    }
+  ],
+  "resources": [
+    {
+      "id": 1,
+      "resourceId": 1000,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-00.30-0.ec2.internal",
+      "isTagged": false,
+      "isOrphaned": false,
+      "isUnderutilize": false,
+      "utilization": 60,
+      "state": "approved",
+      "isActive": true,
+      "instantType": "EC2",
+      "costSavings": 10000
+    },
+    {
+      "id": 2,
+      "resourceId": 1001,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-01.30-0.ec2.internal",
+      "isTagged": false,
+      "isOrphaned": false,
+      "isUnderutilize": true,
+      "utilization": 70,
+      "state": "approved",
+      "isActive": true,
+      "instantType": "EC2",
+      "costSavings": 10000
+    },
+    {
+      "id": 15,
+      "resourceId": 1002,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-01.30-0.ec2.internal",
+      "isTagged": false,
+      "isOrphaned": false,
+      "isUnderutilize": true,
+      "utilization": 40,
+      "state": "approved",
+      "isActive": true,
+      "instantType": "EC2",
+      "costSavings": 10000
+    },
+    {
+      "id": 3,
+      "resourceId": 1003,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-03.30-0.S3.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": true,
+      "utilization": 50,
+      "state": "approved",
+      "isActive": true,
+      "instantType": "S3",
+      "costSavings": 10000
+    },
+    {
+      "id": 14,
+      "resourceId": 1014,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-03.30-0.S3.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": false,
+      "utilization": 70,
+      "state": "approved",
+      "isActive": true,
+      "instantType": "S3",
+      "costSavings": 10000
+    },
+    {
+      "id": 4,
+      "resourceId": 1004,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-04.30-0.S3.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": false,
+      "utilization": 70,
+      "state": "approved",
+      "isActive": true,
+      "instantType": "S3",
+      "costSavings": 10000
+    },
+    {
+      "id": 5,
+      "resourceId": 1099,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-04.30-0.S3.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": true,
+      "utilization": 50,
+      "state": "approved",
+      "isActive": true,
+      "instantType": "S3",
+      "costSavings": 10000
+    },
+    {
+      "id": 6,
+      "resourceId": 1005,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-05.30-0.S3.internal",
+      "isTagged": false,
+      "isOrphaned": false,
+      "isUnderutilize": true,
+      "utilization": 50,
+      "state": "",
+      "isActive": true,
+      "instantType": "S3",
+      "costSavings": 10000
+    },
+    {
+      "id": 7,
+      "resourceId": 1006,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-06.30-0.RDS.internal",
+      "isOrphaned": false,
+      "isTagged": true,
+      "isUnderutilize": true,
+      "utilization": 50,
+      "state": "",
+      "isActive": true,
+      "instantType": "RDS",
+      "costSavings": 10000
+    },
+    {
+      "id": 8,
+      "resourceId": 1007,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-07.30-0.RDS.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": true,
+      "utilization": 50,
+      "state": 1,
+      "isActive": true,
+      "instantType": "RDS",
+      "costSavings": 10000
+    },
+    {
+      "id": 9,
+      "resourceId": 1008,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-08.30-0.Lamda.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": false,
+      "utilization": 100,
+      "state": 1,
+      "isActive": true,
+      "instantType": "Lambda",
+      "costSavings": 10000
+    },
+    {
+      "id": 10,
+      "resourceId": 1009,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-09.30-0.Lamda.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": true,
+      "utilization": 60,
+      "state": 1,
+      "isActive": true,
+      "instantType": "Lambda",
+      "costSavings": 10000
+    },
+    {
+      "id": 11,
+      "resourceId": 1010,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-08.30-0.IAM.internal",
+      "isTagged": true,
+      "isOrphaned": false,
+      "isUnderutilize": false,
+      "utilization": 100,
+      "state": 1,
+      "isActive": true,
+      "instantType": "IAM",
+      "costSavings": 10000
+    },
+    {
+      "id": 12,
+      "resourceId": 1011,
+      "customerId": 1,
+      "cloudAccountId": "ca1000",
+      "resourceName": "ip-10-08.30-0.IAM.internal",
+      "isTagged": false,
+      "isOrphaned": false,
+      "isUnderutilize": false,
+      "utilization": 80,
+      "state": 1,
+      "isActive": true,
+      "instantType": "IAM",
+      "costSavings": 10000
+    }
+  ],
+  "costSavings": [
+    {
+      "customerId": 1,
+      "resourceType": "EC2",
+      "costSavings": 20000
+    },
+    {
+      "customerId": 1,
+      "resourceType": "S3",
+      "costSavings": 80000
+    },
+    {
+      "customerId": 1,
+      "resourceType": "Lambda",
+      "costSavings": 10000
+    },
+    {
+      "customerId": 1,
+      "resourceType": "IAM",
+      "costSavings": 30000
+    },
+    {
+      "customerId": 1,
+      "resourceType": "RDS",
+      "costSavings": 1500
+    }
+  ],
+  "policy": [
+    {
+      "id": 1,
+      "policyId": 1,
+      "customerId": 1,
+      "name": "Delete Orphan Resources",
+      "category": "stopOrphan",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 5,
+      "isValidated": true,
+      "status": "approved",
+      "isRequiredApprover": true,
+      "isActive": true,
+      "isDeletable": true,
+      "tranCompleted": 533
+    },
+    {
+      "id": 2,
+      "policyId": 2,
+      "customerId": 1,
+      "name": "Delete Stopped Resources",
+      "category": "deleteStopped",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 3,
+      "isValidated": false,
+      "status": "",
+      "isRequiredApprover": true,
+      "isActive": true,
+      "isDeletable": true,
+      "tranCompleted": 50
+    },
+    {
+      "id": 3,
+      "policyId": 3,
+      "customerId": 1,
+      "name": "Stop Underutilized Resources",
+      "category": "stopUnderutulized",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 5,
+      "isValidated": false,
+      "status": "",
+      "isRequiredApprover": true,
+      "isActive": true,
+      "isDeletable": true,
+      "tranCompleted": 1300
+    },
+    {
+      "id": 4,
+      "policyId": 4,
+      "customerId": 1,
+      "name": "Resize Underutilized Resources",
+      "category": "resizeUnderutilized",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 4,
+      "isValidated": false,
+      "status": "",
+      "isRequiredApprover": true,
+      "isActive": false,
+      "isDeletable": true,
+      "tranCompleted": 5900
+    },
+    {
+      "id": 5,
+      "policyId": 5,
+      "customerId": 1,
+      "name": "Notify on Lambda Errors",
+      "category": "notifyLambda",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 2,
+      "isValidated": true,
+      "status": "",
+      "isRequiredApprover": true,
+      "isActive": false,
+      "isDeletable": true,
+      "tranCompleted": 100
+    },
+    {
+      "id": 6,
+      "policyId": 6,
+      "customerId": 1,
+      "name": "Low Utilization",
+      "category": "lowuse",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 4,
+      "isValidated": true,
+      "status": "",
+      "isRequiredApprover": true,
+      "isActive": false,
+      "isDeletable": true,
+      "tranCompleted": 870
+    },
+    {
+      "id": 7,
+      "policyId": 7,
+      "customerId": 1,
+      "name": "Delete Unencrypted",
+      "category": "delete",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 5,
+      "isValidated": true,
+      "status": "",
+      "isRequiredApprover": true,
+      "isActive": false,
+      "isDeletable": true,
+      "tranCompleted": 665
+    },
+    {
+      "id": 8,
+      "policyId": 8,
+      "customerId": 1,
+      "name": "Block Public S3 Object ACLs",
+      "category": "blockPublic",
+      "description": "this policy is responsible for doing stuff",
+      "rating": 5,
+      "isValidated": true,
+      "status": "",
+      "isRequiredApprover": true,
+      "isActive": false,
+      "isDeletable": true,
+      "tranCompleted": 930
+    }
+  ],
+  "approval": [
+    {
+      "id": 1,
+      "policyId": 1,
+      "status": "Active",
+      "approvers": [
+        {
+          "profileUuid": "1",
+          "name": "Richard Stevens",
+          "status": "A",
+          "date": "8/8/2023"
+        },
+        {
+          "profileUuid": "2",
+          "name": "Matthias John",
+          "status": "A",
+          "date": "8/8/2023"
+        },
+        {
+          "profileUuid": "3",
+          "name": "Kelly Brooks",
+          "status": "D",
+          "date": "8/8/2023"
+        }
+      ]
+    }
+  ]
+}

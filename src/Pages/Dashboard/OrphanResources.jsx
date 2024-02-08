@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table, Typography } from "antd";
 import { useState, useEffect } from 'react'
+
 function OrphanResources(props) {
     // const [dataSource, setDataSource] = useState([])
     // const [loading, setLoading] = useState(false)
@@ -97,12 +98,9 @@ function OrphanResources(props) {
 
         {
             title: "Type",
-            dataIndex: "instantType"
+            dataIndex: "resourceType"
         },
-        {
-            title: "CustomerId",
-            dataIndex: "customerId"
-        },
+  
         {
             title: "Tagged",
             dataIndex: "isTagged"
@@ -113,7 +111,7 @@ function OrphanResources(props) {
         },
         {
             title: "Use",
-            dataIndex: "utilization"
+            dataIndex: "isUderutilized"
         }
         
     ]

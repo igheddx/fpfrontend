@@ -206,8 +206,8 @@ function SideMenu() {
             PUBLIC: 'Public User',
             NORMAL_USER: "User",
             CUSTOMER_ADMIN_USER: "Customer",
-            SUPER_ADMIN_USER: "Super Admin User",
-            APPROVER_USER: "Approver User"
+            SUPER_ADMIN_USER: "Admin",
+            APPROVER_USER: "Approver"
         }
         
         const CURRENT_USER_TYPE = profileRole;
@@ -244,14 +244,14 @@ function SideMenu() {
         console.log(JSON.stringify(response.data))
         console.log("menu = " + response.data)
         switch(state.role) {
-            case 'admin':
+            case 'Admin':
                 return setMenu(customerAdminRole);
-            case 'viewer':
+            case 'User':
                 console.log("i am a viewer")
                 return setMenu(viewerRole);
-            case 'approver':    
+            case 'Approver':    
                 return setMenu(approverRole);
-            case 'superAdmin':    
+            case 'Customer':    
                 return setMenu(superAdminRole);
             default:
                 return setMenu(viewerRole);
@@ -281,7 +281,19 @@ function SideMenu() {
                         setSelectedKeys("/")
                         setIsUserValid(false);
                         console.log("selectedKeys = " + selectedKeys)
-        
+
+                        /*clear sessions*/
+                        sessionStorage.removeItem("profileData")
+                        sessionStorage.removeItem("xapikey")
+                        sessionStorage.removeItem("xapikeyNoAccessToken")
+                        sessionStorage.removeItem("cloudAccountData")
+                        sessionStorage.removeItem("profileId")
+                        sessionStorage.removeItem("roleData")
+                        sessionStorage.removeItem("accessTokenData")
+                        
+                        
+                        
+                        
                         console.log("i am logging out = pathname2 =" + pathName2)
                         pathName2 = "/"
                     } else {

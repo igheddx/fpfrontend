@@ -19,7 +19,7 @@ import {
   import axios from "axios";
   import CryptoJS from 'crypto-js';
   import { Context } from '../../Store';
-
+  import { setGlobalState, useGlobalState} from '../../state2';
 
   import {
     Chart as ChartJS,
@@ -52,7 +52,10 @@ function Dashboard() {
     const [metricDetails, setMetricDetails] = useState("");
     const [apiRes, setApiRes] = useState([])
     const [customerId, setCustomerId] = useState(0)
-
+    const [error, setError] = useState('');
+    const currentAccountId = useGlobalState("accountId");
+    const currentAccountName = useGlobalState("accountName");
+    const defaultAccountId = useGlobalState("defaultAccountId");
 
     //x-API-Key = 8216EB35-BB77-49AD-94CA-A7C3520DC464
     const getEncryption=() => {
@@ -87,8 +90,11 @@ function Dashboard() {
             phone: "800-555-1234",
         }
     
+    let accessToken = sessionStorage.getItem('accessTokenData')
+    let xapiKeyWithUserName = sessionStorage.getItem('xapikey')
     useEffect (() =>{
 
+      
         if (apiRes.length == 0 ) {
             console.log("apires = 0")
             makeAPICalls()
@@ -108,7 +114,14 @@ function Dashboard() {
         //     setRevenue(res.total);
         // });
         // setMetricDetails("John");
+       
     }, [apiRes])
+
+    useEffect (() =>{
+        //refreshMetrics()
+        console.log("default account Me Dashbboard ==", defaultAccountId)
+        getMyMetrics();
+    }, [currentAccountId])
 
     const handleLinkClick = (card) => {
         console.log('Link clicked' + card);
@@ -120,6 +133,9 @@ function Dashboard() {
     const [apikey, setAPIKey] = useState('')
 
 
+    const refreshMetrics = () => {
+        console.log("I made a call to refreshh metrics")
+    }
    
     const API =  axios.create({
     });
@@ -300,6 +316,89 @@ function Dashboard() {
 
     const list =[];
 
+    const getMyMetrics = async () => {
+        //console.log("getPoliciesUsingAccountId data =", JSON.stringify())
+        
+        let accountId = null;
+        let myDefaultAccountId = null;
+        let myCurrentAccountId = null;
+        /*if the defaultAccountId is not 0 then use that to pull the metrics else
+        use the value from the dropdown selection*/
+        console.log("current AccountId=", currentAccountId)
+        console.log("default AccountId==", defaultAccountId )
+        
+  
+        /*extract defaultAccountId from object*/
+        defaultAccountId.map((d1, key) =>{
+            console.log("my key==", key)
+            if (key == 0){
+                myDefaultAccountId  = d1
+            }
+        })
+
+         /*extract AccountId from object*/
+        currentAccountId.map((d1, key) =>{
+            console.log("my key==", key)
+            if (key == 0){
+                myCurrentAccountId = d1
+            }
+        })
+
+
+        if (myDefaultAccountId != 0) {
+    
+            accountId = myDefaultAccountId;
+        } else {
+            console.log("currentAccount==", currentAccountId)
+
+            accountId = myCurrentAccountId 
+        }
+
+
+        let response = []
+        //let params = new URLSearchParams('?accountId='+myCustomerId+'&isActive=true');
+        //let params = new URLSearchParams(accountId);
+        
+     
+        console.log("access toke =", accessToken)
+        console.log("xapiKeywithUserNam =", xapiKeyWithUserName)
+        response = await API.get("/api/Resource/counts/"+accountId+"/40", 
+        {
+            headers: {
+              'accept': 'text/plain',
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer " + accessToken,
+              'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+         
+            }
+          },
+          
+        
+        ).catch((err) => {
+            setError(err.response.status);
+            console.log("Here " + JSON.stringify(err.response.status))
+        }).finally(() => {
+            setLoading(false);
+        });
+
+        if (response.status  == 200) {
+            
+            let data= response.data
+            console.log("isOrphaned===", data.isOrphanedCount)
+            setOrphanCount(data.isOrphanedCount)
+            setUntaggedCount(data.isUntaggedCount)
+            setLowUseCount(data.isUnderutilizedCount)
+            
+            // setApproversData(null) //clear
+            // setApproversData2(null) //clear
+            // setApproversData(response.data)
+            // setApproversData2(response.data)
+        }
+        
+
+        console.log("metrics=" + JSON.stringify(response.data))
+
+    }
     const getMetricsDetails = async (type) => {
         console.log("metric details was selected")
         let url = ""
@@ -420,19 +519,7 @@ function Dashboard() {
     }
 
 
-    useEffect(() => {
-        //getMetrics()
-        //console.log("will be know thwe status= " + checkUser.map(user => user.userName))
-        //localStorage.setItem("profile", JSON.stringify(getProfile))
-        //console.log("i called local storyage")
-      // getProfile.firstName
-    }, [])
 
-    
-    
-
-       
-    
 
     const [registerProfile, setRegisterProfile] = useState({registerData})
     const makePostAPICalls2=() => {
@@ -465,7 +552,8 @@ function Dashboard() {
 
         <Space size={2} direction="vertical">
             <Typography.Title level={4}>Dashboard</Typography.Title>
-
+     
+        
             {/* {"login response data  == " + loginAPIResponse.firstName + "   " + loginAPIResponse.email}
             <br></br>
             {"APIv Keyv==  " + apikey} */}

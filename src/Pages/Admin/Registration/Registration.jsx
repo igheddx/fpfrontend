@@ -1,12 +1,36 @@
 import React from 'react';
-import { Form, Button, Checkbox, DatePicker, Input, Select, Space, Typography, Alert } from "antd";
+import { Form, Button, Checkbox, DatePicker, Input, Select, Space, Spin, Typography, Alert, Flex, Cascader, InputNumber, Mentions, TreeSelect, InputNumbers} from "antd";
 import { useState, useEffect, useContext } from 'react'
 import { Context } from '../../../Store';
 import useEncryptDecrypt from '../../../API/useEncryptDescrypt';
 import axios from "axios";
 import useBearStore from "../../../state/state";
 import useStore from "../../../state/state";
-//import '../../../App.css';
+import { runes } from 'runes2';
+  
+
+import { LockOutlined, UserOutlined, MailOutlined } from '@ant-design/icons';
+
+
+const { RangePicker } = DatePicker;
+const formItemLayout = {
+  labelCol: {
+    xs: {
+      span: 24,
+    },
+    sm: {
+      span: 6,
+    },
+  },
+  wrapperCol: {
+    xs: {
+      span: 24,
+    },
+    sm: {
+      span: 14,
+    },
+  },
+};
 
 function Registration() {
 
@@ -27,7 +51,7 @@ function Registration() {
   const [state, setState] = useContext(Context);
   const [resCode, setResCode] = useState(0);
   const [isUpdateSuccess, setIsUpdateSuccess] = useState(false);
-
+  
   /*declare state variables*/
   const [availableCloudAccounts, setAvailableCloudAccounts] = useState([]);
   const [xapikeyNoAccessToken, setXapiKeyNoAccessToken] = useState('')
@@ -67,17 +91,14 @@ function Registration() {
 
   const accountRoles = [
     {
-      id: "viewer",
-      label:  "Viewer"
-    },
-    {
-      id: "approver",
+      id: 3,
       label:  "Approver"
     },
     {
-      id: "admin",
-      label:  "Admin"
+      id: 4,
+      label:  "User"
     },
+    
   ];
 
   function uuidv4() {
@@ -113,6 +134,7 @@ function Registration() {
       password: password,
       email: email,
       accountId: cloudId,
+      roleId: role,
       phone: "+1800-123-43537",
       businessUnitId: "Finance"
       /*role: role,
@@ -148,10 +170,10 @@ function Registration() {
     setResCode(response.status)
     
     console.log("create profile status == " + response.status);
-    console.log("data = " + response.data)
+    console.log("data = " + JSON.stringify(response.data));
 
     cleanup(response.status); 
-    
+
 
   }
   
@@ -203,15 +225,71 @@ function Registration() {
 
   }
   
+  const createProfile2 = async (profile) => {
+   
+      let profileData = {
+        firstName: profile.firstName,
+        lastName:  profile.lastName,
+        username: profile.email,
+        password: profile.password,
+        email: profile.email,
+        accountId: profile.cloudId,
+        roleId: profile.role,
+        phone: "+1800-123-43537",
+        businessUnitId: "IT"
+      }
+     
+
+      console.log("API key ==", xapikeyNoAccessToken,)
+      console.log("refresh token", accessToken)
+      console.log("first name = " + firstName)
+      console.log("last name = " + lastName)
+      console.log("email = " + email)
+      
+      console.log("ROLE = " + role)
+      console.log("cloudId = " + cloudId)
+  
+      setLoading(true)
+      let response = await API.post('/api/profile/register', profileData,
+      {
+          headers: {
+              'Accept': 'text/plain',
+              'Content-Type': 'application/json',
+              'Authorization': accessToken,
+              'X-Api-Key': xapikeyNoAccessToken,
+       
+          }
+      },
+      
+      ).catch((err) => {
+          setRegisterProfile(err);
+          console.log("failed status == " + JSON.stringify(err.response.data));
+      }).finally(() => {
+          setLoading(false)
+      });
+      
+
+      setResCode(response.status)
+      
+      console.log("create profile status == " + response.status);
+      console.log("data = " + JSON.stringify(response.data));
+  
+      cleanup(response.status); 
+
+  }
 
    
+  const submitForm = () => {
+    form.resetFields();
+  };
+
 
   const cleanup = (code) => {
     console.log("I was called = and the success code = ", code)
     if (code > 199 && code < 299) {
       console.log("I am between 201 and 299", code)
 
-          
+          submitForm()
         
           setIsUpdateSuccess(true);
          
@@ -253,170 +331,201 @@ function Registration() {
    }
   return (
     <>
-        <Typography.Title level={5}>Create Profile  </Typography.Title>
-        {isUpdateSuccess ==true ? 
-                <><Alert message="Your request was successfully submitted." type="success" /> <br></br></>: "" }
+     
+       
+    <div 
+      style={{
 
-        <div></div>
-        <div
-          style={{
+        width: '500px',
+        backgroundColor:  '#F0F0F0',
+        padding: '14px 20px',
+
+    }}
+      
+    >
+
+    <Typography.Title level={5}>Create Profile  </Typography.Title>
+        {isUpdateSuccess ==true ? 
+                <><Alert message="Profile was successfully created." type="success" /> <br></br></>: "" }
+
+        {loading && 
+          <Spin tip="Processing, please wait" size="small">
+            <div className="content" />
+          </Spin>      
+        }
+
+    </div>
+    <Flex vertical gap={16}>
+
+   
+    <div   
+      style={{
             height: '500px',
             width: '500px',
             backgroundColor:  '#F0F0F0',
-            padding: '14px 20px',
-            margin: 'auto'
-        }}
-      
-        >
-        <Form
-          autoComplete="off"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 13 }}
-          //onFinish={onFinish}
-          form = {form}
-        >
-          <Form.Item
-            name="firstName"
-            label="First Name"
-            
-            rules={[
-              {
-                required: true,
-                message: "Please enter your name",
-              },
-              { whitespace: true },
-              { min: 3 },
-            ]}
+            padding: '14px 20px'
            
-          >
-            <Input placeholder="Type your name" value={firstName} onChange={(e) => {setFirstName(e.target.value);clearAlert()}}/>
-          </Form.Item>
+        }}
+      >
+    
+    <Form
+        labelCol={{span: 8}}
+        wrapperCol={{span: 14}}
+        form={form}
+        autoComplete="off"
+        onFinish={(values) => {createProfile2(values);
+        }}
+        onFinishFailed={(error) => {
+        console.log({ error });
+      }}
+    >
+    
+    <Form.Item
+      label="First Name:"
+      name="firstName"
+      
+      rules={[
+        {
+          required: true,
+          message: 'Please enter first name!',
+        },
+        { whitespace: true },
+        { min: 3 },
+      ]}
+      hasFeedback
+    >
+      <Input placeholder= "Enter First Name" prefix={<UserOutlined className="site-form-item-icon" />}/>
+    </Form.Item>
 
-            {/* <Form.Item 
-              label="First Name"
-            >
-              <input className="textfield2" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-            </Form.Item> */}
-          <Form.Item
-            name="lastName"
-            label="Last Name"
-            rules={[
-              {
-                required: true,
-                message: "Please enter your last name",
-              },
-              { whitespace: true },
-              { min: 3 },
-            ]}
-            
-          >
-            <Input placeholder="Type your name" onChange={(e) => {setLastName(e.target.value);clearAlert()}}/>
-          </Form.Item>
+    <Form.Item
+      label="Last Name:"
+      name="lastName"
+      
+      rules={[
+        {
+          required: true,
+          message: 'Please enter last name!',
+        },
+        { whitespace: true },
+        { min: 3 },
+      ]}
+      hasFeedback
+    >
+      <Input placeholder= "Enter Last Name" prefix={<UserOutlined className="site-form-item-icon" />} />
+    </Form.Item>
 
-          {/*<Form.Item
-            name="title"
-            label="Title"
-            rules={[
-              {
-                required: true,
-                message: "Please enter your title",
-              },
-              { whitespace: true },
-              { min: 3 },
-            ]}
-            clearFields
-          >
-            <Input placeholder="Type your name" onChange={(e) => setTitle(e.target.value)}/>
-          </Form.Item> */} 
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              {
-                required: true,
-                message: "Please enter your email",
-              },
-              { type: "email", message: "Please enter a valid email" },
-            ]}
-            
-          >
-            <Input placeholder="Type your email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </Form.Item>
+    <Form.Item
+      label="Email:"
+      name="email"
+      
+      rules={[
+        {
+          required: true,
+          message: 'Please enter email!',
+        },
 
-          <Form.Item
-            name="password"
-            label="Temporary Password"
-            rules={[
-              {
-                required: true,
-                message: "Please temporary password",
-              },
-              { type: "text", message: "Please enter temporary password" },
-            ]}
-            
-          >
-            <Input placeholder="Type temporary password" onChange={(e) => setPassword(e.target.value)} />
-          </Form.Item>
-         
-          <Form.Item name="cloudAccount" label="Cloud Account" requiredMark="optional">
-            <Select 
-             
-              placeholder="Select cloud account" 
-               onChange={(e) => setCloudId(e) }>
-                {availableCloudAccounts.map((account, key) => { 
-                    return  <Select.Option value={account.id} key={key} >{account.label}</Select.Option>
-                
-                })}
-             </Select>
-          </Form.Item>
-
-          <Form.Item name="role" label="Roles" requiredMark="optional">
-            <Select 
-            
-                placeholder="Select access  level"
-                onChange={e => setRole(e)}
-                
-              >
-               {accountRoles.map((role, key) => { 
-                    return  <Select.Option value={role.id} key={key} >{role.label}</Select.Option>
-                
-                })}
-          </Select>
-            
-          </Form.Item>
-          <Form.Item wrapperCol={{ span: 40 }}>
-          <button onClick={createProfile} className='buttonPrimary'>Create Account</button>
-
-          
-          </Form.Item>
-        </Form>
-        </div>
+        {type: "email", message: "Please enter a valid email"},
        
-        
+      ]}
+      hasFeedback
+    >
+      <Input placeholder= "Enter Email" prefix={<MailOutlined className="site-form-item-icon" />} />
+    </Form.Item>
 
-          {/* <Form.Item
-            name="agreement"
-            wrapperCol={{ span: 24 }}
-            valuePropName="checked"
-            rules={[
-              {
-                validator: (_, value) =>
-                  value
-                    ? Promise.resolve()
-                    : Promise.reject(
-                        "I have verified that  this is a valid user."
-                      ),
-              },
-            ]}
-          >
-            <Checkbox>
-              {" "}
-              Agree to our <a href="#">Terms and Conditions</a>
-            </Checkbox>
-          </Form.Item> */}
-
+    <Form.Item 
+      name="cloudId"  
+      label = "Cloud Account:"
+      rules={[
+        {
+          required: true,
+          message: 'Please select Cloud Account',
+        },
+      ]}
+     >
+        <Select 
           
-        </>
+          placeholder="Select cloud account" 
+            onChange={(e) => setCloudId(e) }>
+            {availableCloudAccounts.map((account, key) => { 
+                return  <Select.Option value={account.id} key={key} >{account.label}</Select.Option>
+            
+            })}
+          </Select>
+    </Form.Item>
+    
+    <Form.Item 
+      name="role"  
+      label="Role:"
+      rules={[
+        {
+          required: true,
+          message: 'Please select a role!',
+        },
+      ]}
+      >
+        <Select 
+        
+            placeholder="Select role"
+            onChange={e => setRole(e)}
+            
+          >
+            {accountRoles.map((role, key) => { 
+                return  <Select.Option value={role.id} key={key} >{role.label}</Select.Option>
+            
+            })}
+      </Select>
+            
+    </Form.Item>
+          
+    <Form.Item
+      label="Temporary Password:"
+      name="password"
+      
+      rules={[
+        {
+          required: true,
+          message: 'Please enter password!',
+        },
+        { whitespace: true },
+        { min: 5 },
+      ]}
+      hasFeedback
+    >
+      <Input placeholder= "Enter temporary password" style={{
+          width: '100%',
+        }} prefix={<LockOutlined className="site-form-item-icon" />}/>
+    </Form.Item>
+   
+    <Form.Item
+    
+      wrapperCol={{ span: 30 }}
+      labelCol={{span: 100}}
+    >
+      <Button 
+        block 
+        type="primary" 
+        className='buttonPrimary' 
+         htmlType="submit"
+         
+         style={
+          {
+            backgroundColor: "#B7E5B4",
+            color: "#343A40",
+            fontWeight: "bold",
+            whiteSpace: "normal",
+            height:'auto',
+            marginBottom:'10px',
+            color: 'white'
+          }
+        }
+      >
+        Create Profile
+      </Button>
+    </Form.Item>
+  </Form>
+  </div>
+  </Flex>
+  </>
   
   );
 }

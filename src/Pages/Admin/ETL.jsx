@@ -1,5 +1,5 @@
-import { Card, Space, Statistic, Table, Typography, Radio, RadioChangeEvent, Avatar, Switch, Rate, Button, Form, Select, Spin, Modal, Alert} from "antd";
-import {useEffect, useState, useContext, useRef} from "react";
+import { Card, Space, Statistic, Table, Typography, Avatar, Rate, Button, Spin, Form, Select, Modal, Alert} from "antd";
+import {useEffect, useState, useContext} from "react";
 import {getInventory} from "../../API";
 import '../../App.css';
 import Approvers from "../../Components/Approvers/Approvers";
@@ -20,19 +20,16 @@ import axios from "axios";
 import OrphanResources from "../../Pages/Dashboard/OrphanResources";
 import LowUtilization from "../../Pages/Dashboard/LowUtilization";
 import UntaggedResources from "../../Pages/Dashboard/UntaggedResources";
-import Resourcetable from "./Resourcetable";
+
 import CostSavings from "../../Pages/Dashboard/CostSavings";
 import CostSavingsDonutChart from "../../Pages/Dashboard/Charts/CostSavingsDonutChart";
-import { setGlobalState, useGlobalState} from '../../state2';
-
 import {
     ExclamationCircleOutlined,
   } from "@ant-design/icons";
 
 
- 
 
-function RunPolicy() {
+function ETL() {
 
     const resourceTableColumns = [
         {
@@ -90,7 +87,7 @@ function RunPolicy() {
 
 
     const [dataSource, setDataSource] = useState([]);
-   
+    const [approversSelected, setApproversSelected] = useState([approvers]);
     const [apiResponse, setApiResponse] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -109,8 +106,7 @@ function RunPolicy() {
     const [submitterUuid, setSubmitterUuid] = useState(null);
 
     const [resourceList, setResourceList] = useState([]);
-    const [isUpdateSuccess, setIsUpdateSuccess] = useState(null);
-    const [message, setMessage] = useState('');
+    const [isUpdateSuccess, setIsUpdateSuccess] = useState(false);
 
     const [approverList2, setApproverList2] = useState([]);
     const [approverListFinal, setApproverListFinal] = useState([]);
@@ -120,13 +116,7 @@ function RunPolicy() {
     const [isHideAffectedResouceTable, setIsHideAffectedResouceTable] = useState(false);
     const [availableCloudAccounts, setAvailableCloudAccounts] = useState([]);
     const [activeCloudAccountId, setActiveCloudAccountId] = useState();
-    const defaultAccountId = useGlobalState("defaultAccountId");
-    const currentAccountId = useGlobalState("accountId");
-    const [value1, setValue1] = useState(0);
-    const initialized = useRef(false);
-    const [previousAccountId, setPreviousAccountId] = useState(0)
-    const [isAutoRun, setIsAutoRun] = useState(true)
-    const [policyValue, setPolicyValue]= useState('');
+  
     /*this state variable is for the resource affect table selection */
     const [select, setSelect] = useState({
         selectedRowKeys: [],
@@ -145,26 +135,22 @@ function RunPolicy() {
 
     let accessToken = sessionStorage.getItem('accessTokenData')
     let xapiKeyWithUserName = sessionStorage.getItem('xapikey')
-    let myProfileId = sessionStorage.getItem('profileId')
-    let accountId2 = getAccountId(currentAccountId, defaultAccountId)
-    useEffect(() => {
-        //getPolicies();
+    let xapikeyNoAccessToken = sessionStorage.getItem('xapikeyNoAccessToken')
+    
 
-        // setCustomerId(state.customerId)
-        // setSubmitterName(state.firstName + " " + state.lastName);
-        // setSubmitterUuid(state.profileUuid);
-        // setIsUpdateSuccess(false);
+    useEffect(() => {
+        getPolicies();
+
+        setCustomerId(state.customerId)
+        setSubmitterName(state.firstName + " " + state.lastName);
+        setSubmitterUuid(state.profileUuid);
+        setIsUpdateSuccess(false);
 
         let accountsData = sessionStorage.getItem('cloundAccountData')
         accountsData = JSON.parse(accountsData)
         setAvailableCloudAccounts(accountsData)
 
         console.log("CloudAccoun =", accountsData)
-
-
-       
-
-        
         // setLoading(true)
         // getInventory().then(res=>{
         //     setDataSource(res.products)
@@ -172,25 +158,7 @@ function RunPolicy() {
         // })
     }, []);
     
-    useEffect (() =>{
-        //refreshMetrics()
-        let accountId = getAccountId(currentAccountId, defaultAccountId)
-
-        setActiveCloudAccountId(accountId)
-        console.log("default account Me ==", defaultAccountId)
-        console.log("before previous account ==", previousAccountId)
-        console.log("previous currend account ==", accountId)
-        
-        //if (accountId == previousAccountId) {
-            console.log("previous I called getAllPolcy")
-        setPolicyData([]);
-        getAllPolicy();
-        //}
-        
-        setIsAutoRun(true); //default autorun is true
-        console.log("after previous account ==", previousAccountId)
-    }, [accountId2])
-
+    
     const [open, setOpen] = useState(false);
    
 
@@ -272,8 +240,6 @@ function RunPolicy() {
         //change true/false to string for display
         response.data.forEach((data2, index) => {
           
-
-            console.log("DATA isTagged", data2.isTagged)
             resourceList1.push (
                 {
                     resourceId: data2.resourceId,
@@ -370,97 +336,18 @@ function RunPolicy() {
     let resourceCategory = ""
 
 
-    /*use this function to determine when to use the default AccountId or the selected accountId*/
-    function getAccountId(currentAccountId, defaultAccountId) {
-        //const result = Math.floor(Math.random() * number);
-         //setLoading(true)
-         let accountId = null;
-         let myDefaultAccountId = null;
-         let myCurrentAccountId = null;
-         /*if the defaultAccountId is not 0 then use that to pull the metrics else
-         use the value from the dropdown selection*/
-         console.log("BIGcurrent AccountId=", currentAccountId)
-         console.log("BIG default AccountId==", defaultAccountId )
-         
-   
-         /*extract defaultAccountId from object*/
-         defaultAccountId.map((d1, key) =>{
-             console.log("BIG my key==", key)
-             if (key == 0){
-                 myDefaultAccountId  = d1
-             }
-         })
- 
-          /*extract AccountId from object*/
-         currentAccountId.map((d1, key) =>{
-             console.log("BIGmy key==", key)
-             if (key == 0){
-                 myCurrentAccountId = d1
-             }
-         })
- 
- 
-         if (myDefaultAccountId != 0) {
-     
-             accountId = myDefaultAccountId;
-             console.log("BIG DEFAULT ACCOUNT==", accountId )
-         } else {
-            
- 
-             accountId = myCurrentAccountId 
-             console.log("BIG currentAccount==", accountId )
-         }
-        return accountId ;
-      }
-
-    const getAllPolicy = async () => {
-        setLoading(true)
-        let accountId = getAccountId(currentAccountId, defaultAccountId)
-       //getUsersUsingAccountId(accountId) //get users
-
-        //setPreviousAccountId(accountId)
-        let response = []
-
-        console.log("cloudAccount Id ==", accountId)
-        //console.log("access toke =", accessToken)
-        //console.log("xapiKeywithUserNam =", xapiKeyWithUserName)
-        response = await API.get("/api/policy/all/"+accountId, 
-        {
-            headers: {
-              'accept': 'text/plain',
-              'Content-Type': 'application/json',
-              'Authorization': "Bearer " + accessToken,
-              'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
-         
-            }
-          },
-          
-        
-        ).catch((err) => {
-            setError(err.response.status);
-           console.log("Here " + JSON.stringify(err.response.status))
-        }).finally(() => {
-            setLoading(false);
-        });
-
-
-        
-        if (response.status  == 200) {
-            //setPolicyData(response.data)
-            getUsersUsingAccountId(accountId,response.data )
-            console.log("policy data == ", JSON.stringify(response.data))
-        }
-        
-        //setPolicyData(response.data)
-       // console.log("my poliyc =" + JSON.stringify(response.data))
+    /*get policies using account Id */
+    const getPoliciesUsingAccountId = async (accountId) => {
+        //getUsersUsingAccountId(accountId)
+        setActiveCloudAccountId(accountId)
     }
 
-     /*get users using account Id */
-     const getUsersUsingAccountId = async (accountId, data) => {
+
+    /*get users using account Id */
+    const getUsersUsingAccountId = async (accountId) => {
         console.log("getPoliciesUsingAccountId data =", JSON.stringify(accountId))
-        setLoading(true);
+    
         let response = []
-        let policyListData = data
         //let params = new URLSearchParams('?accountId='+myCustomerId+'&isActive=true');
         let params = new URLSearchParams(accountId);
         
@@ -487,9 +374,8 @@ function RunPolicy() {
         });
 
         if (response.status  == 200) {
-            setPolicyData(policyListData)
-            // setApproversData(null) //clear
-            // setApproversData2(null) //clear
+            setApproversData(null) //clear
+            setApproversData2(null) //clear
             setApproversData(response.data)
             setApproversData2(response.data)
         }
@@ -498,61 +384,12 @@ function RunPolicy() {
         console.log("Users =" + JSON.stringify(response.data))
 
     }
-    /*get policies using account Id */
-    const getPoliciesUsingAccountId = async (accountId) => {
-        //getUsersUsingAccountId(accountId)
-        //setActiveCloudAccountId(accountId)
-
-        console.log("VISHAL CLOUD==", activeCloudAccountId)
-        console.log("getPoliciesUsingAccountId data =", JSON.stringify(accountId))
-    
-        let response = []
-        //let params = new URLSearchParams('?accountId='+myCustomerId+'&isActive=true');
-        let params = new URLSearchParams(accountId);
-        //let accountId = getAccountId(currentAccountId, defaultAccountId)
-        console.log("access toke =", accessToken)
-        console.log("xapiKeywithUserNam =", xapiKeyWithUserName)
-        response = await API.get("/api/policy/all/"+accountId, 
-        {
-            headers: {
-              'accept': 'text/plain',
-              'Content-Type': 'application/json',
-              'Authorization': "Bearer " + accessToken,
-              'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
-         
-            }
-          },
-          
-        
-        ).catch((err) => {
-            setError(err.response.status);
-            console.log("Here " + JSON.stringify(err.response.status))
-        }).finally(() => {
-            setLoading(false);
-        });
-
-        if (response.status  == 200) {
-            //setPolicyData(response.data)
-        }
-        
-        //setPolicyData(response.data)
-        console.log("my poliyc =" + JSON.stringify(response.data))
-
-    }
-
-
-   
-   
 
     const getPolicyDetail1 = async (policyId) => {
        // const pId = policyId.target.value;
-
-       setIsUpdateSuccess(null) //thhis will clear the message
-       
         const policy = policyData.find(u => u.policyId === policyId);
         setPolicyId(policyId)
         console.log("policy data =", policy.name)
-        setPolicyValue(policy.name)
         console.log("data =", policy)
         console.log("my active cloud account =", activeCloudAccountId)
         let resourcePolicyTypeId = policy.typeId
@@ -565,11 +402,9 @@ function RunPolicy() {
         //     value: user
         // });
         
-        let accountId = getAccountId(currentAccountId, defaultAccountId)
-
         setLoading(true)
          /*option 3 how to make api cal */
-       let response =  await API.get("/api/Resource/all/"+accountId+"/"+resourcePolicyTypeId,
+       let response =  await API.get("/api/Resource/all/"+activeCloudAccountId+"/"+resourcePolicyTypeId,
        {
         headers: {
           'accept': 'text/plain',
@@ -591,12 +426,6 @@ function RunPolicy() {
         console.log("resource data =", JSON.stringify(response.data))
         //change true/false to string for display
         response.data.forEach((data2, index) => {
-
-
-            data2.isTagged ? (console.log("isTagged ==True== ResourceId", data2.resourceId,)) : (console.log("isTagged ==False== ResourceId", data2.resourceId,)) 
-
-
-            console.log("TIM HIERE ==", data2.isTagge )
             switch(resourcePolicyTypeName ) {
                 case 'Tag':
                 if (data2.isTagged == false ) {
@@ -844,7 +673,7 @@ function RunPolicy() {
         selectedOptions = null;
         console.log(" end handledChange =", selectedOptions )
        
-        setApproverDetailsCount(approverName2.length+1)
+            setApproverDetailsCount(approverName2.length+1)
         
         
         //setApproverDetails(approverList);
@@ -1030,7 +859,7 @@ function RunPolicy() {
         console.log("approvers id =", approversId)
         console.log("I am submitted")
         console.log("value of open =", open)
-        console.log("value of isAutoRun", isAutoRun)
+       
        /* let approvalId = Math.floor(Math.random() * 10000)
 
 
@@ -1051,10 +880,8 @@ function RunPolicy() {
         console.log("I called the api")
         let response =  await API.post('/api/Approval/addworkflow',
             {
-                profileId: myProfileId,
                 policyId: policyId,
                 accountId: activeCloudAccountId,
-                isAutoRun: isAutoRun,
                 resourceIds: selectedRowKeys,
                 approvers: approversId,
             },
@@ -1085,32 +912,13 @@ function RunPolicy() {
         console.log("resCode =", resCode)
         if (response.status == 200) {
            
-            if ( response.data.success == false) {
-                setIsUpdateSuccess(false);
-                //setPolicyData({})
-                setPolicyValue('')
-                setMessage("This request was not completed. Reason: " + response.data.errorMessage);
-            } else {
-                setIsUpdateSuccess(true);
-                setMessage("Your request was successfully submitted.");
-                console.log("Your request was successfully submitted")
-            }
             console.log("Workflow was added")
               //clean up
-            //   setIsUpdateSuccess(true);
-            //   setPolicyName('');
-            //   setApproverName2([]);
-            //   setApproverDetails('');
-            //   setMetricDetails('');
-
-
-              setPolicyName(''); //policy list name
-              setApproverName([]); //list of approver names  
-              setApproverName2([]); //list of approver names
-
-              setResourceList([]) //resource list
+              setIsUpdateSuccess(true);
+              setPolicyName('');
+              setApproverName2([]);
               setApproverDetails('');
-              setApproverDetailsCount(0)
+              setMetricDetails('');
            
         }
 
@@ -1255,19 +1063,16 @@ function RunPolicy() {
                 setIsUpdateSuccess(true);
                 setPolicyName('');
                 setApproverName2([]);
-                setResourceList(null) //resource list
-
                 setApproverDetails('');
-                //setMetricDetails('');
-
+                setMetricDetails('');
 
                 //refresh api.. may not need this
-                //getPolicies();
-                //getApprovers(); //this is refreshing approverData
-                //setCustomerId(state.customerId);
-                //setSubmitterName(state.firstName + " " + state.lastName);
-                //setSubmitterUuid(state.profileUuid);
-                //setApproverDetailsCount(0); //use to display approver table
+                getPolicies();
+                getApprovers(); //this is refreshing approverData
+                setCustomerId(state.customerId);
+                setSubmitterName(state.firstName + " " + state.lastName);
+                setSubmitterUuid(state.profileUuid);
+                setApproverDetailsCount(0); //use to display approver table
         
             }
           }
@@ -1289,56 +1094,59 @@ function RunPolicy() {
       console.log("setIsUpdateSucces =", isUpdateSuccess)
     }
 
-    const optionsWithDisabled = [
-        {
-            label: 'No Selection',
-            value: 'noselection',
-        },
-        {
-            label: 'No - do not run after approva',
-            value: 'nno',
-        },
-        {
-            label: 'Yes - run after approval',
-            value: 'yes',
-            //disabled: true,
-        },
-    ];
+    /* tun ryl*/
+    const runETL = async () => {
 
-    const [value4, setValue4] = useState('Apple');
-    const onChange4 = ({ target: { value } }) => {
-        console.log('radio4 checked', value);
-        setValue4(value);
-    };
-    const [autoRun, setautoRun] = useState(1);
-    const onChange = (e) => {
-    console.log('radio checked', e.target.value);
-    setautoRun(e.target.value);
-    };
 
+        let response = []
+
+        console.log("activeCloudAccountId =", activeCloudAccountId)
+        setLoading(true)
+        console.log("access toke =", accessToken)
+        console.log("xapiKeywithUserNam =", xapiKeyWithUserName)
+        response = await API.get("/api/Resource/invokeetl/"+activeCloudAccountId, 
+        {
+            headers: {
+              'accept': 'text/plain',
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer " + accessToken,
+              'X-Api-Key': xapiKeyWithUserName , //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+         
+            }
+          },
+          
+        
+        ).catch((err) => {
+            setError(err.response.status);
+            console.log("Here " + JSON.stringify(err.response.status))
+        }).finally(() => {
+            setLoading(false);
+        });
+        setLoading(false)
+        console.log("ETL Data == ", JSON.stringify(response.data))
+    }
 
     return (
 
         
+
+        
        
         <Space size={20} direction="vertical" >
-           <Typography.Title level={4} >Run Policy</Typography.Title>
-            Auto value = {isAutoRun == true ? "true" : "false"}
-           {loading == true ?
+            {loading == true ?
                 <>
                 <Spin tip="Processing...please wait" size="large">
-                <div className="content" />
+                    <div className="content" />
                 </Spin>
-                
+            
                 </> : ""
             }
 
-
-
+           <Typography.Title level={4} >Run ETL</Typography.Title>
+           
             {isUpdateSuccess ==true ? 
-                <Alert message={message} type="success" style={{width:'500px'}} /> : "" }
-            {isUpdateSuccess ==false ? 
-                <Alert message={message} type="warning" style={{width:'500px'}} /> : "" }
+                <Alert message="Your request was successfully submitted." type="success" /> : "" }
+            
             <div >
             {canDeactivatePolicy ==true &&  policyStatus == "approved" ? 
                 <Alert message="Note: This policy is currently active and in production. To change this policy, you must submit an approval request
@@ -1396,7 +1204,7 @@ function RunPolicy() {
                 />
                 <br></br><br></br> */}
                 <div>
-                {/* <h4>Select Clound accountId</h4>
+                <h4>Select Clound accountId</h4>
                 <Form.Item name="cloudAccount" label="" requiredMark="optional">
                     <Select 
                     
@@ -1409,144 +1217,17 @@ function RunPolicy() {
                         
                         })}
                     </Select>
-                </Form.Item> */}
-
-
-                 
-
-                <h4>Select Policy</h4>
-                {policyData.length >0 ?
-                <Form.Item name="policy" label="" requiredMark="optional">
-                 <Select 
-                    value = {policyValue}
-                    placeholder="Select Policy" 
-                    style={{width:'500px'}}
-                    //onChange={(e) => setPolicyId(e) }>
-                    onChange = {getPolicyDetail1}
-                   >
-                        {policyData.map((policy, key) => { 
-                            return  <Select.Option value={policy.policyId} key={key} >{policy.name}</Select.Option>
-                        
-                        })}
-                   </Select>
-
-                </Form.Item> : <>Policy is not available for Account Id: {accountId2}</>}
+                </Form.Item>
                 </div>
-
-                {policyName != ""? 
-                    <><div><b>Policy Name:</b> {policyDetails.name}</div>
-                    <div><b>Description:</b> {policyDetails.description}</div>
-                    <div><b>Ratings: </b> 
-                    <span>
-                        <Rate tooltips={desc} onChange={setRateValue} value={rateValue} />
-                            {rateValue ? <span className="ant-rate-text">{desc[rateValue - 1]}</span> : ''}
-                        </span>
-                    </div>
-                    <div><b>Transactions Completed:</b> {policyDetails.transCompleted}</div></>
-               : "" }
-
-
-                <h4>Would you like this policy to run automatically after approval?
-                &nbsp; 
-                <Switch checkedChildren="YES" unCheckedChildren="NO" defaultChecked onChange={(e) => setIsAutoRun(e)} /></h4>
-               
-              
-
-               
-                {isHideAffectedResouceTable == false ?
-                    approverDetailsCount >0 && metricDetails == "stopOrphan" ?
-                     <><h5>Affected Resources</h5>
-                    <OrphanResources data={resourceList} /></> : "" 
-
-                  
-                : ""}
-                
-                {isHideAffectedResouceTable == false ?
-                approverDetailsCount >0 && metricDetails == "resizeUnderutilized"  ? 
-                    <><h5>Affected Resources</h5>
-                    <LowUtilization data={resourceList} /></> : "" 
-                : ""}
-
-                {isHideAffectedResouceTable == false ?
-
-                    approverDetailsCount >0 && metricDetails == "deleteStopped"  ?
-                    <><h5>Affected Resources</h5>
-                    <UntaggedResources data={resourceList}  /></> : "" 
-                : ""}
-
-                
-                
-                {resourceList.length > 0 ?
-                <><h4>Affect Resources - 0000</h4>
-                <Table 
-                    rowSelection={rowSelection}
-                    columns={resourceTableColumns} 
-                    dataSource={resourceList} 
-                    rowKey = {(record) => record.resourceId}
-                    loading={loadingTbl}
-                    > 
-                </Table> 
-
-                </>: "" }
-
-                <div>
-                <br></br>
-                <h4>Select Approver(s)</h4>
-                {approversData.length >0 ?
-                <Form.Item name="profile" label="" requiredMark="optional">
-                
-                <Select
-                    mode="multiple"
-                    value = {approverName2}
-                    onChange= {handleChange}
-                    style={{width:'500px'}}
-                    placeholder='Select Approvers' 
-                    >
-                        {approversData.map((profile, key) => { 
-                            return  <Select.Option value={profile.profileid} key={key} >{profile.firstName} {profile.lastName}</Select.Option>
-                        
-                        })}
-                
-                    </Select>
-                </Form.Item> : <>Approvers are not available for Account Id: {accountId2}</>}
-                </div> 
-              {policyName != "" ? 
-                  
-                  <><h4>Select Approver(s)</h4>
-                  <Select
-                  mode="multiple"
-                  value = {approverName2}
-                  onChange= {handleChange}
-                  options={ approversData.map((approver1) => {
-                      return {
-
-                          label: approver1.firstName + " " + approver1.lastName,
-                          value: approver1.id,
-                      };
-                  })} 
-                  
-                  
-
-                  style={{width:'500px'}}
-                  placeholder='Select Approvers' 
-              
-                  /></> : "" }
-            
-
-                {approverDetailsCount >0 ?
-                 <><h4>Approvers Details</h4>
-                 <Table columns={columns} dataSource={approverDetails} /></>
-                                
-                : "" }
+           
                 
                 <Space direction="vertical"
                     style={{
                     width: '100%',
                     
                     }} >
-                     {activeCloudAccountId > 0 && policyId > 0  && selectedRowKeys.length > 0 && approverDetailsCount >0 ?   
-                     <><button class="buttonPrimary" onClick={showModal}>Submit</button>
-                   </> : "" }
+                   <button class="buttonPrimary" onClick={runETL}>Run Data Import</button>
+                   
                 </Space>
                 </Form>
             
@@ -1556,4 +1237,4 @@ function RunPolicy() {
     );
 }
 
-export default RunPolicy;
+export default ETL;

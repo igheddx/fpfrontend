@@ -1,6 +1,6 @@
 
-import { CaretRightOutlined, LikeFilled } from '@ant-design/icons';
-import { Collapse, theme, Typography, Button, Table, Modal, Input, Descriptions } from 'antd'; 
+import { CaretRightOutlined, LikeFilled, LoadingOutlined} from '@ant-design/icons';
+import { Collapse, theme, Typography, Button, Table, Modal, Input, Space, Descriptions, Spin, Tag, Dropdown, Badge } from 'antd'; 
 import React from 'react';
 import axios from "axios";
 
@@ -10,30 +10,81 @@ import useStore from "../../state/state";
 import { useState, useEffect, useContext, useRef } from 'react'
 import { Context } from '../../Store';
 import useEncryptDecrypt from '../../API/useEncryptDescrypt';
-import { EditOutlined, DeleteOutlined, DislikeOutlined, LikeOutlined, TwoToneColor, getTwoToneColor, setTwoToneColor} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, DislikeOutlined, DownOutlined, LikeOutlined, TwoToneColor, getTwoToneColor, setTwoToneColor} from "@ant-design/icons";
 import Approvers from './Approvers';
+import { setGlobalState, useGlobalState} from '../../state2';
 
+const columns3X = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: 'Age',
+    dataIndex: 'age',
+    key: 'age',
+  },
+  {
+    title: 'Address',
+    dataIndex: 'address',
+    key: 'address',
+  },
+  {
+    title: 'Action',
+    dataIndex: '',
+    key: 'x',
+    render: () => <a>Delete</a>,
+  },
+];
+const data3X = [
+  {
+    key: 1,
+    name: 'John Brown',
+    age: 32,
+    address: 'New York No. 1 Lake Park',
+    description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.',
+  },
+  {
+    key: 2,
+    name: 'Jim Green',
+    age: 42,
+    address: 'London No. 1 Lake Park',
+    description: 'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.',
+  },
+  {
+    key: 3,
+    name: 'Not Expandable',
+    age: 29,
+    address: 'Jiangsu No. 1 Lake Park',
+    description: 'This not expandable',
+  },
+  {
+    key: 4,
+    name: 'Joe Black',
+    age: 32,
+    address: 'Sydney No. 1 Lake Park',
+    description: 'My name is Joe Black, I am 32 years old, living in Sydney No. 1 Lake Park.',
+  },
+];
 
-
+const items = [
+  {
+    key: '1',
+    label: 'Action 1',
+  },
+  {
+    key: '2',
+    label: 'Action 2',
+  },
+];
 function PendingApproval () {
 
-  const firstRenderRef = useRef(false);
-  const API = axios.create({
-  });
-  useEffect( () => {
-      //getApprovals();
-      setTwoToneColor('#eb2f96'); //not sure what this is doing
-      getTwoToneColor(); // #eb2f96
-
-      if (firstRenderRef.current) {
-        console.log("Block only runs AFTER initial render");
-        getApproverApprovalsDetails(); //call this method to get the list of approval requests that I am an approver for
-        getMyPolicyApprovalSubmissions(); //call this method to get the list of submissions that i have - may need to filter by role in the future
-      } else {
-        firstRenderRef.current = true;
-        
-      }
-  },[]);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState()
+  const [displayData, setDisplayData] = useState(null)
+  const [displayData2, setDisplayData2] = useState(null)
+  const [open, setOpen] = useState(false);  
 
 
   const [approvalId, setApprovalId] = useState('');
@@ -43,12 +94,14 @@ function PendingApproval () {
   const [submittedDateTime, setSubmittedDateTime] = useState('');
   const [policyStatus, setPolicyStatus] = useState('');
   const [approvalHeaderData, setApprovalHeaderData] = useState([]);
-  const [approvalHeaderData2, setApprovalHeaderData2] = useState([]);
+  const [apaprovalHeaderData2, setApprovalHeaderData2] = useState([]);
+  const [myApprovalData, setMyApprovalData] = useState([])
+  const [myPendingFinalApprovalData, setMyPendingFinalApprovalData] = useState([])
+  const [mySubmissionsWorkflowData,  setMySubmissionsWorkflowData] = useState([])
+  
+ 
   const [approvalHeaderDataMySubmissions, setApprovalHeaderDataMySubmissions] = useState([]);
-  const [affectedResourcesData, 
-    
-    
-  setAffectedResourcesData] = useState([]);
+  const [affectedResourcesData, setAffectedResourcesData] = useState([]);
   const [approvers, setApprovers] = useState([]);
   const [currentApprover, setCurrentApprover] = useState([]);
   const [refresh, setRefresh] = useState(true);
@@ -56,97 +109,207 @@ function PendingApproval () {
   const [policyData, setPolicyData] = useState([])
   const [policyDataApprove, setPolicyDataApprove] = useState([])
   const [policyDataReject, setPolicyDataReject] = useState([])
-  
+
 
   const [resourceDetails, setResourceDetails] = useState([])
   const [resourceDetailsApprove, setResourceDetailsApprove] = useState([])
   const [resourceDetailsReject, setResourceDetailsReject] = useState([])
 
   const [state, setState] = useContext(Context);
+  const [state1, setState1] = useState({
+    data: null,
+    loading: false,
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
   const [dataSource, setDataSource] = useState([
-    {
-      id: 1,
-      name: "John",
-      email: "john@gmail.com",
-      address: "John Address",
-    },
-    {
-      id: 2,
-      name: "David",
-      email: "david@gmail.com",
-      address: "David Address",
-    },
-    {
-      id: 3,
-      name: "James",
-      email: "james@gmail.com",
-      address: "James Address",
-    },
-    {
-      id: 4,
-      name: "Sam",
-      email: "sam@gmail.com",
-      address: "Sam Address",
-    },
-  ]);
-  const columns2 = [
-    {
-      key: "1",
-      title: "ID",
-      dataIndex: "id",
-    },
-    {
-      key: "2",
-      title: "Name",
-      dataIndex: "name",
-    },
-    {
-      key: "3",
-      title: "Email",
-      dataIndex: "email",
-    },
-    {
-      key: "4",
-      title: "Address",
-      dataIndex: "address",
-    },
-    {
-      key: "5",
-      title: "Actions",
-      render: (record) => {
-        return (
-          <>
-            <LikeOutlined
-              onClick={() => {
-                processApproval(record, "");
-              }}
-              style={{ color: "#BB2525", marginLeft: 12, fontSize: "50px", }}
-              twoToneColor="red"
-            />
-            <DislikeOutlined
-              onClick={() => {
-                onDeleteStudent(record);
-              }}
-              style={{ color: "#BB2525", marginLeft: 12, fontSize: "50px", }}
-              twoToneColor="red"
-            />
-          </>
-        );
+      {
+        id: 1,
+        name: "John",
+        email: "john@gmail.com",
+        address: "John Address",
       },
-    },
-  ];
+      {
+        id: 2,
+        name: "David",
+        email: "david@gmail.com",
+        address: "David Address",
+      },
+      {
+        id: 3,
+        name: "James",
+        email: "james@gmail.com",
+        address: "James Address",
+      },
+      {
+        id: 4,
+        name: "Sam",
+        email: "sam@gmail.com",
+        address: "Sam Address",
+      },
+    ]);
+    const columns2 = [
+      {
+        key: "1",
+        title: "ID",
+        dataIndex: "id",
+      },
+      {
+        key: "2",
+        title: "Name",
+        dataIndex: "name",
+      },
+      {
+        key: "3",
+        title: "Email",
+        dataIndex: "email",
+      },
+      {
+        key: "4",
+        title: "Address",
+        dataIndex: "address",
+      },
+      {
+        key: "5",
+        title: "Actions",
+        render: (record) => {
+          return (
+            <>
+              <LikeOutlined
+                onClick={() => {
+                  processApproval(record, "");
+                }}
+                style={{ color: "#BB2525", marginLeft: 12, fontSize: "50px", }}
+                twoToneColor="red"
+              />
+              <DislikeOutlined
+                onClick={() => {
+                  onDeleteStudent(record);
+                }}
+                style={{ color: "#BB2525", marginLeft: 12, fontSize: "50px", }}
+                twoToneColor="red"
+              />
+            </>
+          );
+        },
+      },
+    ];
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState()
-  const [displayData, setDisplayData] = useState(null)
-  const [displayData2, setDisplayData2] = useState(null)
-  const [open, setOpen] = useState(false);  
- 
+  const firstRenderRef = useRef(false);
+  const [availableCloudAccounts, setAvailableCloudAccounts] = useState([]);
+  const [activeCloudAccountId, setActiveCloudAccountId] = useState(0);
+  const [profileId, setProfileId] = useState();
+  const [spinning, setSpinning] = useState(false);
+  const currentAccountId = useGlobalState("accountId");
+  const currentAccountName = useGlobalState("accountName");
+  const defaultAccountId = useGlobalState("defaultAccountId");
+
+
+
+  let accountId2 = getAccountId(currentAccountId, defaultAccountId)
+  let accessToken = sessionStorage.getItem('accessTokenData')
+  let xapiKeyWithUserName = sessionStorage.getItem('xapikey')
+  let customerRole = sessionStorage.getItem('roleData')
+
+  const API = axios.create({
+  });
+  useEffect( () => {
+      //getApprovals();
+      
+
+      let accountsData = sessionStorage.getItem('cloundAccountData')
+      accountsData = JSON.parse(accountsData)
+      setAvailableCloudAccounts(accountsData)
+
+      let myProfileId = sessionStorage.getItem('profileId')
+      console.log("MY PROFILE =", myProfileId)
+      //myProfileId = JSON.parse(myProfileId)
+      setProfileId(myProfileId)
+
+      if (accountsData.length == 1) {
+        setActiveCloudAccountId(accountsData.id)
+      }
+
+      console.log("CloudAccoun =", accountsData)
+
+      setTwoToneColor('#eb2f96'); //not sure what this is doing
+      getTwoToneColor(); // #eb2f96
+     
+      if (firstRenderRef.current) {
+        getApproverApprovalsDetails()
+        console.log("Block only runs AFTER initial render");
+        //getApproverApprovalsDetails(); //call this method to get the list of approval requests that I am an approver for
+        //getMyPolicyApprovalSubmissions(); //call this method to get the list of submissions that i have - may need to filter by role in the future
+      } else {
+        firstRenderRef.current = true;
+        
+      }
+
+     
+
+  },[]);
+
+
+  useEffect (() =>{
+    //refreshMetrics()
+    let accountId = getAccountId(currentAccountId, defaultAccountId)
+
+    setActiveCloudAccountId(accountId)
+    console.log("default account Me ==", defaultAccountId)
+   
+    console.log("customer role =", customerRole)
+    if (customerRole =="Customer") {
+      console.log("getworkflow data")
+      getWorkflowData()
+    }
+  }, [accountId2])
+
+
 
   
+  
+  /*use this function to determine when to use the default AccountId or the selected accountId*/
+  function getAccountId(currentAccountId, defaultAccountId) {
+    //const result = Math.floor(Math.random() * number);
+     //setLoading(true)
+     let accountId = null;
+     let myDefaultAccountId = null;
+     let myCurrentAccountId = null;
+     /*if the defaultAccountId is not 0 then use that to pull the metrics else
+     use the value from the dropdown selection*/
+     console.log("BIGcurrent AccountId=", currentAccountId)
+     console.log("BIG default AccountId==", defaultAccountId )
+     
+
+     /*extract defaultAccountId from object*/
+     defaultAccountId.map((d1, key) =>{
+         console.log("BIG my key==", key)
+         if (key == 0){
+             myDefaultAccountId  = d1
+         }
+     })
+
+      /*extract AccountId from object*/
+     currentAccountId.map((d1, key) =>{
+         console.log("BIGmy key==", key)
+         if (key == 0){
+             myCurrentAccountId = d1
+         }
+     })
+
+
+     if (myDefaultAccountId != 0) {
  
+         accountId = myDefaultAccountId;
+         console.log("BIG DEFAULT ACCOUNT==", accountId )
+     } else {
+        
+
+         accountId = myCurrentAccountId 
+         console.log("BIG currentAccount==", accountId )
+     }
+    return accountId ;
+  }
 
   let approvalData = []
 
@@ -204,7 +367,7 @@ function PendingApproval () {
     {
       key: "4",
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "workflowStatusString",
     },
     {
         key: "2",
@@ -263,7 +426,7 @@ function PendingApproval () {
     {
       key: "4",
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "approverStatusString",
     },
     {
         key: "2",
@@ -332,7 +495,7 @@ function PendingApproval () {
     },
     {
       title: 'Status',
-      dataIndex: 'status',
+      dataIndex: 'workflowStatusString',
       key: "3",
     },
     {
@@ -346,6 +509,190 @@ function PendingApproval () {
       key: "5",
     },
   ]
+
+  // profileId: d1.profileId,
+  // approverStatus: d1.status,
+  // approverStatusString: d1.statusString,
+  // approvalWorkflowId: d1.workflow.approvalWorkflowId,
+  // policyId: d1.workflow.policyId,
+  // resourceId: d1.workflow.resourceId,
+  // accountId: d1.workflow.accountId,
+  // workfowStatus: d1.workflow.status,
+  // workflowStatusString: d1.workflow.statusString,
+  // policyName: d1.workflow.policyName,
+  // resourceName: d1.workflow.resourceName,
+  // createdDateTime: d1.workflow.createdDate,
+
+  const columnsMyApproval = [
+    {
+      key: "1",
+      title: "Id",
+      dataIndex: "approvalWorkflowId",
+    },  
+    {
+      key: "2",
+      title: "Policy",
+      dataIndex: "policyName",
+      render: (text, record) => <a  onClick={() => {
+        getApprovalDetails(record);
+      }}>{text}</a>,
+    },
+    {
+      key: "3",
+      title: "My Approval",
+      dataIndex: "workflowStatusString",
+      render: (tag) => {
+        const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
+        return <Tag color={color} key={tag}>{tag}</Tag>
+      }
+    },
+    {
+      key: "7",
+      title: "Final Approval",
+      dataIndex: "approverStatusString",
+      render: (tag) => {
+        const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
+        return <Tag color={color} key={tag}>{tag}</Tag>
+      }
+    },
+    {
+      key: "4",
+      title: "Resource Name",
+      dataIndex: "resourceName",
+      render: (text, record) => <a  onClick={() => {
+        getApprovalDetails(record);
+      }}>{text}</a>,
+        
+    },
+    {
+      key: "5",
+      title: "Submitted Date",
+      dataIndex: "createdDateTime",
+    
+    },
+    {
+      key: "6",
+      title: "Actions",
+      render: (record) => {
+        return (
+          <>
+            <Button
+              onClick={() => {
+                processApproval(record, "approve");
+              }}
+              style={{ color: '#29BB89', marginLeft: 12, fontSize: "15px", borderColor: "green" }}
+             
+            >
+              Approve
+              </Button>
+            <Button
+              onClick={() => {
+                processApproval(record, "reject");
+              }}
+              style={{ color: "#D83A56", marginLeft: 12, fontSize: "15px", }}
+              
+              danger 
+            >
+              Reject
+            </Button>
+          </>
+        );
+      },
+    },
+  ];
+
+  const columnsMyPendingApproval = [
+    {
+      key: "1",
+      title: "Id",
+      dataIndex: "approvalWorkflowId",
+    },  
+    {
+          key: "2",
+          title: "Policy",
+          dataIndex: "policyName",
+          render: (text, record) => <a  onClick={() => {
+            getApprovalDetails(record);
+          }}>{text}</a>,
+    },
+    // {
+    //   key: "3",
+    //   title: "My Approval",
+    //   dataIndex: "approverStatusString",
+    //   render: (tag) => {
+    //     const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
+    //     return <Tag color={color} key={tag}>{tag}</Tag>
+    //   }
+    // },
+    {
+      key: "7",
+      title: "Final Approval",
+      dataIndex: "workflowStatusString",
+      render: (tag) => {
+        const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
+        return <Tag color={color} key={tag}>{tag}</Tag>
+      }
+    },
+    {
+        key: "4",
+        title: "Resource Name",
+        dataIndex: "resourceName",
+        render: (text, record) => <a  onClick={() => {
+          getApprovalDetails(record);
+        }}>{text}</a>,
+        
+    },
+    {
+        key: "5",
+        title: "Submitted Date",
+        dataIndex: "createdDateTime",
+    
+    },
+    
+  ];
+
+
+  const columnsMySubmissions = [
+    {
+      key: "1",
+      title: "Id",
+      dataIndex: "approvalWorkflowId",
+    },  
+    {
+          key: "2",
+          title: "Policy",
+          dataIndex: "policyName",
+          render: (text, record) => <a  onClick={() => {
+            getApprovalDetails(record);
+          }}>{text}</a>,
+    },
+
+    {
+      key: "7",
+      title: "Status",
+      dataIndex: "approverStatusString",
+      render: (tag) => {
+        const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
+        return <Tag color={color} key={tag}>{tag}</Tag>
+      }
+    },
+    {
+        key: "4",
+        title: "Resource Name",
+        dataIndex: "resourceName",
+        render: (text, record) => <a  onClick={() => {
+          getApprovalDetails(record);
+        }}>{text}</a>,
+        
+    },
+    {
+        key: "5",
+        title: "Submitted Date",
+        dataIndex: "createdDateTime",
+    
+    },
+    
+  ];
 
   const columsApprovers = [
     {
@@ -392,6 +739,7 @@ function PendingApproval () {
  
 
   const processApproval  = async (data, type) => {
+    showLoader();
     let approver = null;
     let isApproved = false;
     let status =  null;
@@ -400,89 +748,56 @@ function PendingApproval () {
     let approvalHeaderId =0;
     let headerData = [];
     let affectedResouce2 = [];
-    //get approval header data id value
-    console.log("approvalHeaderData==",approvalHeaderData)
-    //filter the header data I need
-    const tempApprovalHeader = approvalHeaderData.filter(header => header.approvalId == data.approvalId);
 
-    tempApprovalHeader.map((d1, key) => {
-      approvalHeaderId = d1.id;
-       headerData = {
+    let approvalType = null 
+    console.log("my data =", data)
+    console.log("my type =", type)
+    console.log(" xapiKeyWithUserName =",  xapiKeyWithUserName)
+    console.log(" accessToken =",  accessToken)
+    
 
-          customerId: d1.customerId,
-          policyId: d1.policyId,
-          state: d1.state,
-          isApproved: d1.isApproved,
-          submittedByProfileUuid: d1.submittedByProfileUuid,
-          approvalId: d1.approvalId,
-          policyName: d1.policyName,
-          status: d1.status,
-          submittedByName: d1.submittedByName,
-          submittedDateTime: d1.submittedDateTime,
-          affectedResources: d1.affectedResources,
-          id: d1.id,
-        
-      }
-    })
-
-    console.log("approvalHeaderId==", approvalHeaderId)
-
-    if (type=='approve') {
-      status = type;
-      isApproved = true;
-    } else if (type == 'reject') {
-      status = type;
-      isApproved = true;
-    } else  {
-      status = "";
-      isApproved = false;
-    }
-    console.log("type ==", type)
+    console.log("workflowid = ", data.approvalWorkflowId)
   
-
-   
-    console.log("the value of type =", type + "and =" + data.approvalId)
-    console.log("current approver =", JSON.stringify(currentApprover))
-    currentApprover.map((d1, key) => {
-      if (data.approvalId == d1.approvalId) {
-        profileUuid = d1.profileUuid
-        id = d1.id;
-        approver = {
-          approvalId: d1.approvalId,
-          customerId: d1.customerId,
-          policyId: d1.policyId,
-          profileUuid: d1.profileUuid,
-          firstName: d1.firstName,
-          lastName: d1.lastName,
-          title: d1.title,
-          status: status,
-          isApproved: isApproved,
-          id: d1.id,
+    if (type == 'approve') {
+      approvalType = 3
+    } else if (type =='reject') {
+      approvalType = 4 
+    } else  {
+      approvalType = 2
+    }
+    console.log("approvalType = ", approvalType)
+    console.log("profileId = ", data.profileId)
+    
+    setLoading(true)
+    let response = await API.post("/api/approval/update", 
+    {
+      workflowId: data.approvalWorkflowId,
+      profileId: data.profileId,
+      status: approvalType,
+    },
+    {
+        headers: {
+            'Accept': 'text/plain',
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + accessToken,
+            'X-Api-Key': xapiKeyWithUserName,
         }
-      }
-      
-    });
-
-      
-    console.log("approver UPDATE", approver)
-    let params = null;
-    let approvalId = data.approvalId
-    let customerId = state.customerId
-
-    let response = []
-    params = new URLSearchParams('?approvaId='+ approvalId +'&profileUuid='+profileUuid + '&customerId='+customerId);
-    response = await API.put("http://localhost:3000/policyApprovalApprovers/"+id, approver).catch((err) => {
-        //setError(err.response.status);
-        console.log("Here ERROR " + JSON.stringify(err))
+    },
+    
+    ).catch((err) => {
+        //setRegisterProfile(err);
+        console.log("failed status == " + JSON.stringify(err.response.data));
     }).finally(() => {
-        setLoading(false);
+        setLoading(false)
     });
+    
+    console.log("approval is done", JSON.stringify(response.data));
 
-    console.log("UPDATE My approval =", JSON.stringify(response.data))
-    console.log("MY HEADERDATA 1", headerData)
-    //refresh
-    getApproverApprovalsDetails();
-    finalizeApproval(approvalId, approvalHeaderId,  headerData)
+    //do this to refresh the data
+    if (response.status == 200) {
+      getApproverApprovalsDetails();
+    }
+
   }
 
 
@@ -795,7 +1110,7 @@ function PendingApproval () {
    
     console.log("DOM POLICY =" + JSON.stringify(response.data));
     console.log("DOM RESOURCE FINAL LIST", JSON.stringify(resourceListFinal));
-}
+  }
 
 
 /*call method to officially approve policy*/
@@ -818,31 +1133,95 @@ const approvePolicy = async (data,id) => {
     }).finally(() => {
         setLoading(false)
     });
+  }
 
+  /*call method to officially approve resource*/
+  const approveResource = async (data, id) => {
 
-}
-
-/*call method to officially approve resource*/
-const approveResource = async (data, id) => {
-
-  console.log("APPROVE RESOURCE = ID ="+id, JSON.stringify(data))
-  let response = []
-  response = await API.put('http://localhost:3000/resources/'+id, data).then((res) => {
-        //setRegisterProfile(res.data)  //loginAPIResponse, res.data, {customerid: value.customerid});
-        //setLoginAPIResponse());
+    console.log("APPROVE RESOURCE = ID ="+id, JSON.stringify(data))
+    let response = []
+    response = await API.put('http://localhost:3000/resources/'+id, data).then((res) => {
+          //setRegisterProfile(res.data)  //loginAPIResponse, res.data, {customerid: value.customerid});
+          //setLoginAPIResponse());
+          
+          console.log("APPROVE RESOURCE STATUS  == " + res.status);
+          console.log("payload", JSON.stringify(res.data))
+          console.log("data = " + res.data)
+          console.log("approval Id =", res.data.approvalId)
         
-        console.log("APPROVE RESOURCE STATUS  == " + res.status);
-        console.log("payload", JSON.stringify(res.data))
-        console.log("data = " + res.data)
-        console.log("approval Id =", res.data.approvalId)
-      
-    }).catch((err) => {
-        //setRegisterProfile(err);
-        console.log("failed status == " + JSON.stringify(err.response.data));
+      }).catch((err) => {
+          //setRegisterProfile(err);
+          console.log("failed status == " + JSON.stringify(err.response.data));
+      }).finally(() => {
+          setLoading(false)
+      });
+  }
+
+
+  /*getWorkflow Datae*/
+  const getWorkflowData = async () => {
+    
+    let accountId = getAccountId(currentAccountId, defaultAccountId)
+
+    setLoading(true)
+    console.log("my state  =", state)
+    //let theApprovalId = data.approvalId;
+    let mySubmissionsWorkflowData = [];
+   
+    let displayStatus = "";
+
+    let response = await API.get("/api/Approval/workflows/"+accountId ,
+    {
+      headers: {
+        'accept': 'text/plain',
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + accessToken,
+        'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+  
+      }
+    },
+    ).catch((err) => {
+        setError(err);
+        console.log("Here " + err.response.data)
     }).finally(() => {
-        setLoading(false)
+        setLoading(false);
     });
-}
+
+    
+    if (response.data.length > 0) {
+      console.log('daGa-', JSON.stringify(response.data))
+      let counter = response.data.length 
+      response.data.map((d1, index) =>{
+        
+        //store approver info in this object 
+        console.log("2original status d1.statusString ", d1.statusString)
+        console.log("2workflow status  d1.workflow.statusString",  d1.statusString)
+        console.log("2resource Id =", d1.resourceId)
+        console.log("2BLA status =", d1.status)
+        console.log("2BLA workflow status =", d1.status)
+        mySubmissionsWorkflowData.push(
+          {
+            key: index,
+            profileId: d1.profileId,
+            approverStatus: d1.status,
+            approverStatusString: d1.statusString,
+            approvalWorkflowId: d1.approvalWorkflowId,
+            policyId: d1.policyId,
+            resourceId: d1.resourceId,
+            accountId: d1.accountId,
+            workfowStatus: d1.status,
+            workflowStatusString: d1.statusString,
+            policyName: d1.policyName,
+            resourceName: d1.resourceId + " - " + d1.resourceName,
+            createdDateTime: d1.createdDate,
+          }
+        )
+      })
+
+      setMySubmissionsWorkflowData(mySubmissionsWorkflowData);
+    } 
+    
+  }
 
   let resource = []
   let approvalDataList = [] //used on the main screen table list
@@ -856,55 +1235,153 @@ const approveResource = async (data, id) => {
     setLoading(true)
     let customerId = state.customerId;
     let profileUuid = state.profileUuid;
+    let myProfileId = sessionStorage.getItem('profileId')
     console.log("my state  =", state)
     //let theApprovalId = data.approvalId;
-    let currentApprover  = [];
+    let pendingReviewApprovalData = [];
+    let pendingFinalApprovalData = []
     let displayStatus = "";
     //let params = new URLSearchParams('?profileUuid='+profileUuid+'&customerId='+customerId+'&isApproved=false');
+    //let params = new URLSearchParams('?customerId='+customerId+'&profileUuid='+profileUuid+'&isApproved=false');
     let params = new URLSearchParams('?customerId='+customerId+'&profileUuid='+profileUuid+'&isApproved=false');
     
     console.log("customerid=" + customerId + "profileUuid=" + profileUuid )
-    let response = await API.get("http://localhost:3000/policyApprovalApprovers", {params}).catch((err) => {
+    let response = await API.get("/api/Approval/mylist/"+myProfileId,
+    {
+      headers: {
+        'accept': 'text/plain',
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + accessToken,
+        'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+   
+      }
+    },
+    ).catch((err) => {
         setError(err);
         console.log("Here " + err.response.data)
     }).finally(() => {
         setLoading(false);
     });
 
-  
+    
     console.log('daGa-', JSON.stringify(response.data))
     console.log("LENGH",response.data.length )
-    if (response.data.length ==0) {
-      setApprovalHeaderData([]);
-    } else {
+    if (response.data.length > 0) {
+    
       let counter = response.data.length 
       response.data.map((d1, index) =>{
         
-        //store approver info in this object 
-        currentApprover.push(
-          {
-            approvalId: d1.approvalId,
-            customerId: d1.customerId,
-            policyId: d1.policyId,
-            profileUuid: d1.profileUuid,
-            firstName: d1.firstName,
-            lastName: d1.lastName,
-            title: d1.title,
-            status: d1.status,
-            isApproved: d1.isApproved,
-            id: d1.id,
+
+        console.log("MY INDEX ==", index)
+        if (d1.status== 2 && d1.workflow.status ==2) {
+         
+
+          //store approver info in this object 
+          console.log("2original status d1.statusString ", d1.statusString)
+          console.log("2workflow status  d1.workflow.statusString",  d1.workflow.statusString)
+          console.log("2resource Id =", d1.workflow.resourceId)
+          console.log("2BLA status =", d1.status)
+          console.log("2BLA workflow status =", d1.workflow.status)
+          pendingReviewApprovalData.push(
+            {
+              key: index,
+              profileId: d1.profileId,
+              approverStatus: d1.status,
+              approverStatusString: d1.statusString,
+              approvalWorkflowId: d1.workflow.approvalWorkflowId,
+              policyId: d1.workflow.policyId,
+              resourceId: d1.workflow.resourceId,
+              accountId: d1.workflow.accountId,
+              workfowStatus: d1.workflow.status,
+              workflowStatusString: d1.workflow.statusString,
+              policyName: d1.workflow.policyName,
+              resourceName: d1.workflow.resourceId + " - " + d1.workflow.resourceName,
+              createdDateTime: d1.workflow.createdDate,
+            }
+          )
+        }
+
+        /*pending and approved */
+        if (d1.status== 2 && d1.workflow.status != 2) {
+          console.log("BLA original status d1.statusString ", d1.statusString)
+          console.log("BLA workflow status  d1.workflow.statusString",  d1.workflow.statusString)
+          console.log("BLA resource Id =", d1.workflow.resourceId)
+          console.log("BLA status =", d1.status)
+          console.log("BLA workflow status =", d1.workflow.status)
+          console.log("MY INDEX ==", index)
+          pendingFinalApprovalData.push(
+            {
+              key: index,
+              profileId: d1.profileId,
+              approverStatus: d1.status,
+              approverStatusString: d1.statusString,
+              approvalWorkflowId:  d1.workflow.approvalWorkflowId, //index, //d1.workflow.approvalWorkflowId,
+              policyId: d1.workflow.policyId,
+              resourceId: d1.workflow.resourceId,
+              accountId: d1.workflow.accountId,
+              workfowStatus: d1.workflow.status,
+              workflowStatusString: d1.workflow.statusString,
+              policyName: d1.workflow.policyName,
+              resourceName: d1.workflow.resourceId + " - " + d1.workflow.resourceName,
+              createdDateTime: d1.workflow.createdDate,
+            }
+          )
+        }
+
+        /*all approved */
+        if (d1.status== 3 && d1.workflow.status == 3) {
+          pendingFinalApprovalData.push(
+            {
+              key: index,
+              profileId: d1.profileId,
+              approverStatus: d1.status,
+              approverStatusString: d1.statusString,
+              approvalWorkflowId:  d1.workflow.approvalWorkflowId, //index, //d1.workflow.approvalWorkflowId,
+              policyId: d1.workflow.policyId,
+              resourceId: d1.workflow.resourceId,
+              accountId: d1.workflow.accountId,
+              workfowStatus: d1.workflow.status,
+              workflowStatusString: d1.workflow.statusString,
+              policyName: d1.workflow.policyName,
+              resourceName: d1.workflow.resourceId + " - " + d1.workflow.resourceName,
+              createdDateTime: d1.workflow.createdDate,
+            }
+          )
+        }
+
+
+      })
+       
+
+      response.data.map((d1, index) =>{
+        /*approval data thas have been reviewed by the approver */
+        if (d1.status == 2 && d1.workflow.status != 2) {
+          if (d1.workflow.workflowStatusString == "Pending") {
+            console.log("IGHEDOSA")
           }
-        )
+          
+         
+        }
   
         //use counter to determine when all approval header data is complete
-        counter = counter - 1
-        getApprovalHeader(d1.approvalId, counter); //use this to get approver header information 
+        //counter = counter - 1
+        //getApprovalHeader(d1.approvalId, counter); //use this to get approver header information 
         // getApprovers(d1.approvalId);
       })
-      setCurrentApprover(currentApprover);
-    }
+      //setCurrentApprover(currentApprover);
+      setMyApprovalData(pendingReviewApprovalData)
+      setMyPendingFinalApprovalData(pendingFinalApprovalData)
+
+      console.log(" pendingReviewApprovalData ==",  pendingReviewApprovalData)
+      console.log(" pendingFinalApprovalData ==",  pendingFinalApprovalData)
+      
+    } 
   }
 
+  const getApproverFromWorkflow =() => {
+   
+
+  }
 
   /*call this method to get all the approval requests that i submitted.*/
   const getMyPolicyApprovalSubmissions = async () => {
@@ -1134,21 +1611,142 @@ const approveResource = async (data, id) => {
 
 
 
-
+  const showLoader = () => {
+    setSpinning(true);
+    setTimeout(() => {
+      setSpinning(false);
+    }, 3000);
+  };
 
   const resetEditing = () => {
     setIsEditing(false);
     setEditingStudent(null);
   };
+
+
+
+
+ const fetch = async (expanded, record) => {
+    console.log("fetch record ==", JSON.stringify(record))
+  console.log("expand value==", expanded)
+    let workflowId = record.approvalWorkflowId
+    await axios.get("/api/approval/group/"+workflowId, 
+    {
+      headers: {
+        'accept': 'text/plain',
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + accessToken,
+        'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+   
+      }
+    },
+    ).then(res => {
+      const data = res.data;
+
+      setState1({
+        ...state1.data,
+          data,
+          loading: true
+      })
+
+      console.log("my nested data ==", JSON.stringify(res.data))
+  }).catch(error => {
+      console.log(error, "error")
+  })
+  }
+  
+  // state1 = {
+  //   data: null,
+  //   loading: false,
+  // }
+  const expandedRowRender1=() => {
+    
+    let myNestedData = []
+    if(state1.loading){
+      
+      console.log(" state1.date===", JSON.stringify( state1.data))
+      const nestedTableData = state1.data.map((row, index) => ({
+        
+        key: index,
+        //satus: row.statusString,
+        firstName: row.firstName,
+        lastName: row.lastName,
+        email: row.email,
+        status: row.statusString,
+        //data2.isTagged ? "true" : "false",
+       
+      })
+      )
+      const nestedColumns = [
+       
+        {
+          key: "status",
+          title: "Approval",
+          dataIndex: "status",
+          render: (tag) => {
+            const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
+            return <Tag color={color} key={tag}>{tag}</Tag>
+          }
+        },
+        { title: "First Name", dataIndex: "firstName", key: "firstName" },
+        { title: "Last Name", dataIndex: "lastName", key: "lastName" },
+       
+        
+      ];
+      return <Table columns={nestedColumns} dataSource={nestedTableData } pagination={false} />          
+  }
+};
   return (
     <>
-    
-        {/* <Button onClick={onAddStudent}>Add a new Student</Button> */}
-         <Typography.Title level={4} >Pending Policy Approval</Typography.Title>
-         {approvalHeaderData.length >0 ?
-          <Table columns={columns} dataSource={approvalHeaderData}></Table> 
-          : "You have no policy to review " }
+        <br></br>
+       {loading == true ?
+        <>
+          <Spin tip="Processing...please wait" size="large">
+          <div className="content" />
+          </Spin>
+        
+          </> : ""
+        }
+         
+        {customerRole == "Customer" && mySubmissionsWorkflowData.length >0 ?
+        <><Typography.Title level={4} >My Submissions </Typography.Title>
+        
+            <Table
+              columns={columnsMySubmissions}
+              dataSource={mySubmissionsWorkflowData}
+              expandable={{
+                expandedRowRender: expandedRowRender1,
+                rowExpandable: record => true,
+                onExpand: fetch,
+              }}  
+            
+            />
+        </> : ""}
 
+
+        {/* <Button onClick={onAddStudent}>Add a new Student</Button> */}
+         <Typography.Title level={4} >Policy Pending your Review</Typography.Title>
+         {myApprovalData.length >0 ?
+         
+          <Table dataSource={myApprovalData} columns={columnsMyApproval}  />
+          : "You have no policy to review " }
+        
+        {myPendingFinalApprovalData.length >0 ?
+        <><Typography.Title level={4} >My Reviewed Policy Approvals</Typography.Title>
+        
+            <Table
+              columns={columnsMyPendingApproval}
+              dataSource={myPendingFinalApprovalData}
+              expandable={{
+                expandedRowRender: expandedRowRender1,
+                rowExpandable: record => true,
+                onExpand: fetch,
+              }}  
+            
+            />
+        </>
+          : ""}
+        
         {approvalHeaderDataMySubmissions.length >0 ?
         <><Typography.Title level={4} >My Policy Approval Submissions</Typography.Title>
         <Table columns={columnsSubmissions} dataSource={approvalHeaderDataMySubmissions}></Table> </>
@@ -1164,7 +1762,7 @@ const approveResource = async (data, id) => {
             >
 
             <Typography.Title level={5} >Approval Info</Typography.Title>
-            <Table dataSource={approvalHeaderData2} columns={columnsAppHeader} pagination={false} />
+            <Table dataSource={myApprovalData} columns={columnsMyApproval} pagination={false} />
 
             <Typography.Title level={5} >Approvers</Typography.Title>
             <Table dataSource={approvers} columns={columsApprovers} />
@@ -1222,6 +1820,15 @@ const approveResource = async (data, id) => {
           />
         </Modal> */}
     
+   
+
+
+
+
+      
+
+      
+
     </>
   );
 }

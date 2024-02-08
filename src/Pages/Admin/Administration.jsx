@@ -8,6 +8,7 @@ import PolicyMgmt from './PolicyMgmt/PolicyMgmt';
 import LinkPolicy from './PolicyMgmt/LinkPolicy';
 
 import SuperAdmin from './SuperAdmin/SuperAdmin';
+import ETL from './ETL'
 import index from './../Logins/index.css'
 
 function Administration () {
@@ -38,6 +39,11 @@ function Administration () {
       key: 5,
       label: `Super Admin`,
       children: <SuperAdmin/>,
+    },
+    {
+      key: 6,
+      label: `Data Management`,
+      children: <ETL/>,
     },
   ];
 

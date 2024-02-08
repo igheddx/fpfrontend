@@ -76,3 +76,5 @@ https://iezp2kpwab2k4dd67retkt4feq0sldxw.lambda-url.us-east-2.on.aws
 ## URL for authentication
 
 https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws
+
+## run this to start the server so that i can call finpromptu api npx json-server --watch db.json --port 3000

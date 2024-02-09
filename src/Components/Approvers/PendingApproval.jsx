@@ -540,7 +540,7 @@ function PendingApproval () {
     {
       key: "3",
       title: "My Approval",
-      dataIndex: "workflowStatusString",
+      dataIndex: "approverStatusString",
       render: (tag) => {
         const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
         return <Tag color={color} key={tag}>{tag}</Tag>
@@ -549,7 +549,7 @@ function PendingApproval () {
     {
       key: "7",
       title: "Final Approval",
-      dataIndex: "approverStatusString",
+      dataIndex: "workflowStatusString",
       render: (tag) => {
         const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
         return <Tag color={color} key={tag}>{tag}</Tag>
@@ -670,7 +670,7 @@ function PendingApproval () {
     {
       key: "7",
       title: "Status",
-      dataIndex: "approverStatusString",
+      dataIndex: "workflowStatusString",
       render: (tag) => {
         const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
         return <Tag color={color} key={tag}>{tag}</Tag>
@@ -1273,7 +1273,7 @@ const approvePolicy = async (data,id) => {
         
 
         console.log("MY INDEX ==", index)
-        if (d1.status== 2 && d1.workflow.status ==2) {
+        if (d1.status== 2 ) {
          
 
           //store approver info in this object 
@@ -1302,7 +1302,7 @@ const approvePolicy = async (data,id) => {
         }
 
         /*pending and approved */
-        if (d1.status== 2 && d1.workflow.status != 2) {
+        if (d1.status > 2 ) {
           console.log("BLA original status d1.statusString ", d1.statusString)
           console.log("BLA workflow status  d1.workflow.statusString",  d1.workflow.statusString)
           console.log("BLA resource Id =", d1.workflow.resourceId)

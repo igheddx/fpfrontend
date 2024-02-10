@@ -509,7 +509,7 @@ function Signin() {
             
         <form >
            
-            <label for="email">Email Address:</label>
+            <label for="email">Email:</label>
             <input 
                 type="text" 
                 required

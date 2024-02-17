@@ -251,7 +251,7 @@ function RunPolicy() {
         console.log("query string", qryString)
         setLoading(true)
          /*option 3 how to make api cal */
-       let response =  await API.get("/api/Resources/all/"+policyType,
+       let response =  await API.get("/api/Resources/all/"+accountId2+"/"+policyType,
        {
         headers: {
           'accept': 'text/plain',
@@ -599,7 +599,7 @@ function RunPolicy() {
             console.log("TIM HIERE ==", data2.isTagge )
             switch(resourcePolicyTypeName ) {
                 case 'Tag':
-                if (data2.isTagged == false ) {
+                //if (data2.isTagged == false ) {
                     resourceList1.push (
                         {
                             resourceId: data2.resourceId,
@@ -613,7 +613,7 @@ function RunPolicy() {
                             costSavings: data2.costSavings
                         }
                     )
-                }
+               // }
 
                 case 'deleted':
                     if (data2.isUderutilitzed == true) {
@@ -1324,14 +1324,15 @@ function RunPolicy() {
         <Space size={20} direction="vertical" >
            <Typography.Title level={4} >Run Policy</Typography.Title>
             Auto value = {isAutoRun == true ? "true" : "false"}
-           {loading == true ?
+           {/* {loading == true ?
                 <>
                 <Spin tip="Processing...please wait" size="large">
                 <div className="content" />
                 </Spin>
                 
                 </> : ""
-            }
+            } */}
+            <Spin spinning={loading} fullscreen />
 
 
 

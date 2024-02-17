@@ -98,6 +98,7 @@ function PendingApproval () {
   const [myApprovalData, setMyApprovalData] = useState([])
   const [myPendingFinalApprovalData, setMyPendingFinalApprovalData] = useState([])
   const [mySubmissionsWorkflowData,  setMySubmissionsWorkflowData] = useState([])
+  const [mySubmissionsWorkflowDataIsAutoRunFalse,  setMySubmissionsWorkflowDataIsAutoRunFalse] = useState([])
   
  
   const [approvalHeaderDataMySubmissions, setApprovalHeaderDataMySubmissions] = useState([]);
@@ -652,6 +653,7 @@ function PendingApproval () {
   ];
 
 
+  //to see all my completed submissions
   const columnsMySubmissions = [
     {
       key: "1",
@@ -670,7 +672,7 @@ function PendingApproval () {
     {
       key: "7",
       title: "Status",
-      dataIndex: "workflowStatusString",
+      dataIndex: "statusString",
       render: (tag) => {
         const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
         return <Tag color={color} key={tag}>{tag}</Tag>
@@ -688,12 +690,76 @@ function PendingApproval () {
     {
         key: "5",
         title: "Submitted Date",
-        dataIndex: "createdDateTime",
+        dataIndex: "createdDate",
     
     },
     
   ];
 
+
+  //to see my submissions that requires manual process
+  const columnsMySubmissionsIsAutoRunFalse = [
+    {
+      key: "1",
+      title: "Id",
+      dataIndex: "approvalWorkflowId",
+    },  
+    {
+          key: "2",
+          title: "Policy",
+          dataIndex: "policyName",
+          render: (text, record) => <a  onClick={() => {
+            getApprovalDetails(record);
+          }}>{text}</a>,
+    },
+
+    {
+      key: "7",
+      title: "Status",
+      dataIndex: "statusString",
+      render: (tag) => {
+        const color = tag.includes('Pending')?'gold':tag.includes('Rejected')?"red":tag.includes('Approve')?'green':''
+        return <Tag color={color} key={tag}>{tag}</Tag>
+      }
+    },
+    {
+        key: "4",
+        title: "Resource Name",
+        dataIndex: "resourceName",
+        render: (text, record) => <a  onClick={() => {
+          getApprovalDetails(record);
+        }}>{text}</a>,
+        
+    },
+    {
+        key: "5",
+        title: "Submitted Date",
+        dataIndex: "createdDate",
+    
+    },
+    {
+      key: "6",
+      title: "Actions",
+      render: (record) => {
+        return (
+          <>
+      
+            {record.isAutoRun == false ?
+            <Button
+              onClick={() => {
+                processApprovalManualRun(record, "runmanual");
+              }}
+              style={{ color: '#29BB89', marginLeft: 12, fontSize: "15px", borderColor: "green" }}
+             
+            >
+              Run Policy
+              </Button> : "" }
+           
+          </>
+        );
+      },
+    },
+  ];
   const columsApprovers = [
     {
       title: "First Name",
@@ -737,6 +803,45 @@ function PendingApproval () {
 
  
  
+  const processApprovalManualRun = async (data, type) => {
+
+
+    let accountId = getAccountId(currentAccountId, defaultAccountId)
+
+    setLoading(true)
+    console.log("my state  =", data)
+
+    let workflowId = data.approvalWorkflowId;
+    let requestId = data.requestId;
+    console.log("my workflowId ==", workflowId)    
+    console.log("my requestId ==", requestId)    
+    
+    let response = await API.post("/api/Policy/submit", 
+    {
+      requestId: requestId,
+      workflowId: workflowId,
+    },
+    {
+      headers: {
+        'accept': 'text/plain',
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + accessToken,
+        'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+  
+      }
+    },
+    ).catch((err) => {
+        setError(err);
+        console.log("Here " + err.response.data)
+    }).finally(() => {
+        setLoading(false);
+    });
+    console.log("status==", response.data)
+
+    console.log("Manual Run ==", JSON.stringify(response.data));
+
+
+  }
 
   const processApproval  = async (data, type) => {
     showLoader();
@@ -1167,7 +1272,8 @@ const approvePolicy = async (data,id) => {
     console.log("my state  =", state)
     //let theApprovalId = data.approvalId;
     let mySubmissionsWorkflowData = [];
-   
+    let mySubmissionsWorkflowDataIsAutoFalse = []    
+
     let displayStatus = "";
 
     let response = await API.get("/api/Approval/workflows/"+accountId ,
@@ -1199,26 +1305,84 @@ const approvePolicy = async (data,id) => {
         console.log("2resource Id =", d1.resourceId)
         console.log("2BLA status =", d1.status)
         console.log("2BLA workflow status =", d1.status)
-        mySubmissionsWorkflowData.push(
-          {
-            key: index,
-            profileId: d1.profileId,
-            approverStatus: d1.status,
-            approverStatusString: d1.statusString,
-            approvalWorkflowId: d1.approvalWorkflowId,
-            policyId: d1.policyId,
-            resourceId: d1.resourceId,
-            accountId: d1.accountId,
-            workfowStatus: d1.status,
-            workflowStatusString: d1.statusString,
-            policyName: d1.policyName,
-            resourceName: d1.resourceId + " - " + d1.resourceName,
-            createdDateTime: d1.createdDate,
-          }
-        )
+        console.log("2BLA workflow status =", d1.statusString + "--- workflowId =" + d1.approvalWorkflowId)
+        if (d1.isAutoRun == false && d1.status != 6) {
+          mySubmissionsWorkflowDataIsAutoFalse.push(
+            {
+              // key: index,
+              // profileId: d1.profileId,
+              // approverStatus: d1.status,
+              // approverStatusString: d1.statusString,
+              // approvalWorkflowId: d1.approvalWorkflowId,
+              // policyId: d1.policyId,
+              // resourceId: d1.resourceId,
+              // accountId: d1.accountId,
+              // workfowStatus: d1.status,
+              // workflowStatusString: d1.statusString,
+              // policyName: d1.policyName,
+              // resourceName: d1.resourceId + " - " + d1.resourceName,
+              // createdDateTime: d1.createdDate,
+              // isAutoRun: d1.isAutoRun,
+
+              key: index,
+              errorCode: d1.errorCode,
+              success: d1.success,
+              approvalWorkflowId: d1.approvalWorkflowId,
+              policyId: d1.policyId,
+              resourceId: d1.resourceId,
+              accountId: d1.accountId,
+              status: d1.status,
+              statusString: d1.statusString,
+              policyName: d1.policyName,
+              resourceName: d1.resourceName,
+              createdDate: d1.createdDate,
+              requestId: d1.requestId,
+              isAutoRun: d1.isAutoRun,
+
+            }
+          )
+        } else {
+          mySubmissionsWorkflowData.push(
+            {
+              // key: index,
+              // profileId: d1.profileId,
+              // approverStatus: d1.status,
+              // approverStatusString: d1.statusString,
+              // approvalWorkflowId: d1.approvalWorkflowId,
+              // policyId: d1.policyId,
+              // resourceId: d1.resourceId,
+              // accountId: d1.accountId,
+              // workfowStatus: d1.status,
+              // workflowStatusString: d1.statusString,
+              // policyName: d1.policyName,
+              // resourceName: d1.resourceId + " - " + d1.resourceName,
+              // createdDateTime: d1.createdDate,
+              // isAutoRun: d1.isAutoRun,
+
+
+              key: index,
+              errorCode: d1.errorCode,
+              success: d1.success,
+              approvalWorkflowId: d1.approvalWorkflowId,
+              policyId: d1.policyId,
+              resourceId: d1.resourceId,
+              accountId: d1.accountId,
+              status: d1.status,
+              statusString: d1.statusString,
+              policyName: d1.policyName,
+              resourceName: d1.resourceName,
+              createdDate: d1.createdDate,
+              requestId: d1.requestId,
+              isAutoRun: d1.isAutoRun,
+            }
+          )
+        }
+       
       })
 
       setMySubmissionsWorkflowData(mySubmissionsWorkflowData);
+      setMySubmissionsWorkflowDataIsAutoRunFalse (mySubmissionsWorkflowDataIsAutoFalse);
+      
     } 
     
   }
@@ -1301,14 +1465,10 @@ const approvePolicy = async (data,id) => {
           )
         }
 
-        /*pending and approved */
-        if (d1.status > 2 ) {
-          console.log("BLA original status d1.statusString ", d1.statusString)
-          console.log("BLA workflow status  d1.workflow.statusString",  d1.workflow.statusString)
-          console.log("BLA resource Id =", d1.workflow.resourceId)
-          console.log("BLA status =", d1.status)
-          console.log("BLA workflow status =", d1.workflow.status)
-          console.log("MY INDEX ==", index)
+        
+
+        /*all approved */
+        if (d1.status== 3 && d1.workflow.status == 3) {
           pendingFinalApprovalData.push(
             {
               key: index,
@@ -1326,10 +1486,13 @@ const approvePolicy = async (data,id) => {
               createdDateTime: d1.workflow.createdDate,
             }
           )
-        }
-
-        /*all approved */
-        if (d1.status== 3 && d1.workflow.status == 3) {
+        } else if (d1.status > 2 && d1.workflow.status < 3 ) {
+          console.log("BLA original status d1.statusString ", d1.statusString)
+          console.log("BLA workflow status  d1.workflow.statusString",  d1.workflow.statusString)
+          console.log("BLA resource Id =", d1.workflow.resourceId)
+          console.log("BLA status =", d1.status)
+          console.log("BLA workflow status =", d1.workflow.status)
+          console.log("MY INDEX ==", index)
           pendingFinalApprovalData.push(
             {
               key: index,
@@ -1432,6 +1595,8 @@ const approvePolicy = async (data,id) => {
     })
 
     setApprovalHeaderDataMySubmissions(approvalHeaderSubmitted)
+   
+    
     console.log('daGa-', JSON.stringify(response.data))
     console.log("LENGH",response.data.length )
     
@@ -1699,15 +1864,32 @@ const approvePolicy = async (data,id) => {
   return (
     <>
         <br></br>
-       {loading == true ?
+       {/* {loading == true ?
         <>
           <Spin tip="Processing...please wait" size="large">
           <div className="content" />
           </Spin>
         
           </> : ""
-        }
-         
+        } */}
+         <Spin spinning={loading} size="large" fullscreen />
+
+         {customerRole == "Customer" && mySubmissionsWorkflowDataIsAutoRunFalse.length >0 ?
+        <><Typography.Title level={4} >My Submissions - Manually Trigger Policy Run </Typography.Title>
+        
+            <Table
+              columns={columnsMySubmissionsIsAutoRunFalse}
+              dataSource={mySubmissionsWorkflowDataIsAutoRunFalse}
+              expandable={{
+                expandedRowRender: expandedRowRender1,
+                rowExpandable: record => true,
+                onExpand: fetch,
+              }}  
+            
+            />
+        </> : ""}
+
+
         {customerRole == "Customer" && mySubmissionsWorkflowData.length >0 ?
         <><Typography.Title level={4} >My Submissions </Typography.Title>
         

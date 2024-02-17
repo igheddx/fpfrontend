@@ -1133,14 +1133,16 @@ function ETL() {
         
        
         <Space size={20} direction="vertical" >
-            {loading == true ?
+            {/* {loading == true ?
                 <>
                 <Spin tip="Processing...please wait" size="large">
                     <div className="content" />
                 </Spin>
             
                 </> : ""
-            }
+            } */}
+
+            <Spin spinning={loading} size="large" fullscreen />
 
            <Typography.Title level={4} >Run ETL</Typography.Title>
            

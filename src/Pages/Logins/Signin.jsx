@@ -496,12 +496,12 @@ function Signin() {
             {incorrectLogin ? <Warning data = {2} /> : null}
             {changePassword ? <Warning data = {3} /> : null}
             {!loading && error && <Warning data = {4} /> }
-            {loading && 
-          <Spin tip="Processing, please wait" size="small">
+            {/* {loading && 
+            <Spin tip="Processing, please wait" size="small">
             <div className="content" />
-          </Spin>      
-        }
-
+            </Spin>      
+            } */}
+            <Spin spinning={loading} fullscreen />
         </div>
         <Space size={10} />
         <div className='create'>

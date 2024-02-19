@@ -22,4 +22,5 @@ artifacts:
     - src/**/*
     - package.json
     - appspec.yml
+    - buildspec.yml
     - scripts/**/*

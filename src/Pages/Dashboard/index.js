@@ -97,7 +97,7 @@ function Dashboard() {
       
         if (apiRes.length == 0 ) {
             console.log("apires = 0")
-            makeAPICalls()
+            //makeAPICalls()
         }
         setCustomerId(state.customerId)
         // getOrders().then((res) => {

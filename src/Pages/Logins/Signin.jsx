@@ -60,20 +60,40 @@ function Signin() {
         //setHeader1(encryptDecryptData)
     }, []);
 
-    const API = axios.create({
-       //baseURL: "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
-       headers: { 
-        'Accept': 'text/plain',
-        'Content-Type': 'application/json',
-        'Authorization': '',
-        'X-Api-Key': 'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
 
-        // 'Accept': 'text/plain',
-        // 'Content-Type': 'application/json',
-        // 'Authorization': '',
-        // 'X-Api-Key': encryptDecryptData,
-     }
+    let token = sessionStorage.getItem('accessTokenData')
+    const API = axios.create(
+        
+        {
+        
+        baseURL: "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
+   
+        headers: {
+        'accept': 'text/plain',
+        'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
+        'Access-Control-Allow-Origin': 'http://localhost:3000',
+        'Access-Control-Allow-Headers': 'X-Requested-With',
+        'Authorization': "Bearer " + token,
+        'X-Api-Key': encryptDecryptDataWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+ 
+        }
     });
+
+    //encryption without user name
+    const API2 = axios.create({
+        baseURL: "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
+   
+        headers: {
+            'accept': 'text/plain',
+            'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
+            'Access-Control-Allow-Origin': 'http://localhost:3000',
+            "Access-Control-Allow-Headers": 'X-Requested-With',
+            'Authorization': '',
+            'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+    
+        }
+    });
+
 
    
 
@@ -177,6 +197,52 @@ function Signin() {
         console.log("encrypt no user name", encryptDecryptDataNoUserName)
         setLoading(true)
         console.log("I called the api")
+        let url = "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws"
+
+        /*let response = await axios({
+            
+            
+            method: 'post',
+            url: `http://localhost:3000/api/profile/authenticate`,
+            withCredentials: false,
+            data: {
+                username: username,
+                password: password
+            },
+           
+            // params: {
+            //   access_token: '',
+            // },
+          }).catch((err2) => {
+            setError(err2);
+        }).finally(() => {
+            setLoading(false)
+            
+        });*/
+
+        /*
+        const axios = require('axios');
+
+        const options = {
+        method: 'GET',
+        url: 'https://famous-quotes4.p.rapidapi.com/random',
+        params: {
+            category: 'all',
+            count: '2'
+        },
+        headers: {
+            'X-RapidAPI-Key': 'SIGN-UP-FOR-KEY',
+            'X-RapidAPI-Host': 'famous-quotes4.p.rapidapi.com'
+        }
+        };
+
+        try {
+            const response = await axios.request(options);
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+        */
         let response =  await axios.post("/api/profile/authenticate",
             {
                 username: username,
@@ -186,6 +252,8 @@ function Signin() {
                 headers: {
                     'Accept': 'text/plain',
                     'Content-Type': 'application/json',
+                    //'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    //'Access-Control-Allow-Headers': 'X-Requested-With',
                     'Authorization': '',
                     'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
              
@@ -196,7 +264,7 @@ function Signin() {
         }).finally(() => {
             setLoading(false)
             
-        });
+        }); 
 
         setLoading(false)
         console.log("username =", username)

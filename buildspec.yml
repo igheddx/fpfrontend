@@ -14,9 +14,6 @@ phases:
       # run build script
       - npm run build
 
-  post_build:
-    command:
-      - sudo scp -r build/* /var/www/html
 artifacts:
   # include all files required to run application
   # notably excluded is node_modules, as this will cause overwrite error on deploy
@@ -25,5 +22,35 @@ artifacts:
     - src/**/*
     - package.json
     - appspec.yml
-    - buildspec.yml
     - scripts/**/*
+# version: 0.2
+
+# phases:
+#   install:
+#     runtime-versions:
+#       nodejs: 18
+
+#     commands:
+#       # install npm
+#       - npm install
+
+#   build:
+#     commands:
+#       # run build script
+#       - npm run build
+
+#   post_build:
+#     command:
+#     aws s3 cps3://fpfrontends3/178eec96-791b-49e5-b13c-4b734e44362d.gz
+#       #- sudo scp -r build/* /var/www/html
+# artifacts:
+#   # include all files required to run application
+#   # notably excluded is node_modules, as this will cause overwrite error on deploy
+#   files:
+#     - public/**/*
+#     - src/**/*
+#     - package.json
+#     - appspec.yml
+#     - buildspec.yml
+#     - scripts/**/*
+

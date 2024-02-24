@@ -23,6 +23,9 @@ artifacts:
     - package.json
     - appspec.yml
     - scripts/**/*
+cache:
+  paths:
+    - "node_modules/**/*"
 # version: 0.2
 
 # phases:

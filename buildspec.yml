@@ -16,9 +16,9 @@ phases:
 
   post_build:
     command:
-     aws s3 cp s3://codepipeline-us-east-1-908788960299/Dev-Pipeline-Finprom/
-     #s3://fpfrontends3/178eec96-791b-49e5-b13c-4b734e44362d.gz
-       - sudo scp -r build/* /var/www/html
+      - aws s3 cp s3://codepipeline-us-east-1-908788960299/Dev-Pipeline-Finprom/
+      #s3://fpfrontends3/178eec96-791b-49e5-b13c-4b734e44362d.gz
+      - sudo scp -r build/* /var/www/html
 
 artifacts:
   # include all files required to run application

@@ -8,7 +8,7 @@ phases:
     commands:
       # install npm
       - npm install
-
+      - npm install --save-dev @babel/plugin-proposal-private-property-in-object
   build:
     commands:
       # run build script
@@ -29,6 +29,7 @@ artifacts:
     - package.json
     - appspec.yml
     - scripts/**/*
+    - build/**/*
 cache:
   paths:
     - "node_modules/**/*"

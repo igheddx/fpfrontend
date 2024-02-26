@@ -17,7 +17,9 @@ phases:
   post_build:
     command:
       #- aws s3 cp s3://codepipeline-us-east-1-908788960299/Dev-Pipeline-Finprom/
-      - sudo aws s3 cp s3://codepipeline-us-east-1-908788960299/Dev-Pipeline-Finprom/build/ /var/www/html --recursive
+      #the command below works, but i don't need to get the build file from S3 bucket, it's the build folder o
+      #of the project
+      #- sudo aws s3 cp s3://codepipeline-us-east-1-908788960299/Dev-Pipeline-Finprom/build/ /var/www/html --recursive
 
       #s3://fpfrontends3/178eec96-791b-49e5-b13c-4b734e44362d.gz
       # - sudo scp -r build/* /var/www/html

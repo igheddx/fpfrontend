@@ -70,7 +70,8 @@ function Signin() {
    
         headers: {
         'accept': 'text/plain',
-        'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
+        'Content-Type': 'application/json',
+        //'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
         'Access-Control-Allow-Origin': 'http://localhost:3000',
         'Access-Control-Allow-Headers': 'X-Requested-With',
         'Authorization': "Bearer " + token,
@@ -81,13 +82,14 @@ function Signin() {
 
     //encryption without user name
     const API2 = axios.create({
-        baseURL: "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
+        //baseURL: "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
    
         headers: {
             'accept': 'text/plain',
-            'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
-            'Access-Control-Allow-Origin': 'http://localhost:3000',
-            "Access-Control-Allow-Headers": 'X-Requested-With',
+            'Content-Type': 'application/json',
+            //'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
+            // 'Access-Control-Allow-Origin': 'http://localhost:3000',
+            // "Access-Control-Allow-Headers": 'X-Requested-With',
             'Authorization': '',
             'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
     
@@ -243,22 +245,22 @@ function Signin() {
             console.error(error);
         }
         */
-        let response =  await axios.post("/api/profile/authenticate",
+        let response =  await API2.post("/api/profile/authenticate",
             {
                 username: username,
                 password: password,
             },
-            {
-                headers: {
-                    'Accept': 'text/plain',
-                    'Content-Type': 'application/json',
-                    //'Access-Control-Allow-Origin': 'http://localhost:3000',
-                    //'Access-Control-Allow-Headers': 'X-Requested-With',
-                    'Authorization': '',
-                    'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+            // {
+            //     headers: {
+            //         'Accept': 'text/plain',
+            //         'Content-Type': 'application/json',
+            //         //'Access-Control-Allow-Origin': 'http://localhost:3000',
+            //         //'Access-Control-Allow-Headers': 'X-Requested-With',
+            //         'Authorization': '',
+            //         'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
              
-                }
-            },
+            //     }
+            // },
         ).catch((err2) => {
             setError(err2);
         }).finally(() => {

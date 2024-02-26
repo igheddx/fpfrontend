@@ -24,7 +24,7 @@ function Warning(propsMessageCode) {
     },
     {
       code: 4,
-      message: "Something went wron. Please try again.",
+      message: "Something went wrong. Please try again.",
       type: "warning"
     },
     {

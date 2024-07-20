@@ -247,22 +247,22 @@ function Signin() {
             console.error(error);
         }
         */
-        let response =  await API2.post("/api/profile/authenticate",
+        let response =  await axios.post(url+"/api/profile/authenticate",
             {
                 username: username,
                 password: password,
             },
-            // {
-            //     headers: {
-            //         'Accept': 'text/plain',
-            //         'Content-Type': 'application/json',
-            //         //'Access-Control-Allow-Origin': 'http://localhost:3000',
-            //         //'Access-Control-Allow-Headers': 'X-Requested-With',
-            //         'Authorization': '',
-            //         'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+            {
+                headers: {
+                    'Accept': 'text/plain',
+                    'Content-Type': 'application/json',
+                    //'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    //'Access-Control-Allow-Headers': 'X-Requested-With',
+                    'Authorization': '',
+                    'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
              
-            //     }
-            // },
+                }
+            },
         ).catch((err2) => {
             setError(err2);
         }).finally(() => {

@@ -1098,13 +1098,13 @@ function ETL() {
     const runETL = async () => {
 
 
-        let response = []
+        //let response = []
 
-        console.log("activeCloudAccountId =", activeCloudAccountId)
+        console.log("RUN ETL activeCloudAccountId =", activeCloudAccountId)
         setLoading(true)
-        console.log("access toke =", accessToken)
-        console.log("xapiKeywithUserNam =", xapiKeyWithUserName)
-        response = await API.get("/api/Resource/invokeetl/"+activeCloudAccountId, 
+        console.log("RUN ETL access toke =", accessToken)
+        console.log("RUN ETL xapiKeywithUserNam =", xapiKeyWithUserName)
+        let response = await API.get("/api/Resource/invokeetl/"+activeCloudAccountId, 
         {
             headers: {
               'accept': 'text/plain',
@@ -1118,7 +1118,7 @@ function ETL() {
         
         ).catch((err) => {
             setError(err.response.status);
-            console.log("Here " + JSON.stringify(err.response.status))
+            console.log("RUN ETL Here " + JSON.stringify(err.response.status))
         }).finally(() => {
             setLoading(false);
         });

@@ -86,35 +86,39 @@ function OrphanResources(props) {
   
 
    //console.log("orphan component data " + JSON.stringify(props.data))
-    const columns = [
-        {
-            title: "Id",
-            dataIndex: "resourceId"
-        },
-        {
-            title: "Name",
-            dataIndex: "resourceName"
-        },
+   const columns = [
+    {
+        title: "Id",
+        dataIndex: "resourceId"
+    },
+    {
+        title: "Name",
+        dataIndex: "resourceName"
+    },
+    {
+        title: "Status",
+        dataIndex: "statusString"
+    },
 
-        {
-            title: "Type",
-            dataIndex: "resourceType"
-        },
-  
-        {
-            title: "Tagged",
-            dataIndex: "isTagged"
-        },
-        {
-            title: "Orphaned",
-            dataIndex: "isOrphaned"
-        },
-        {
-            title: "Use",
-            dataIndex: "isUderutilized"
-        }
-        
-    ]
+    {
+        title: "Type",
+        dataIndex: "resourceType"
+    },
+    
+    {
+        title: "Tagged",
+        dataIndex: "isTagged"
+    },
+    {
+        title: "Orphaned",
+        dataIndex: "isOrphaned"
+    },
+    {
+        title: "Use",
+        dataIndex: "isUnderutilized"
+    }
+    
+]
     const dataSource = [
         { 
             id: "AWS000123", 

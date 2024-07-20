@@ -28,6 +28,8 @@
 
     "crypto-js": "^4.1.1",
 
+    "dateformat": "^5.0.3",
+
     "http-proxy-middleware": "^2.0.6",
 
     "json-server": "^0.17.3",

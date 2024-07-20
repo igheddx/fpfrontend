@@ -125,7 +125,7 @@ function RunPolicy() {
     const [value1, setValue1] = useState(0);
     const initialized = useRef(false);
     const [previousAccountId, setPreviousAccountId] = useState(0)
-    const [isAutoRun, setIsAutoRun] = useState(true)
+    const [isAutoRun, setIsAutoRun] = useState(false)
     const [policyValue, setPolicyValue]= useState('');
     /*this state variable is for the resource affect table selection */
     const [select, setSelect] = useState({
@@ -187,7 +187,7 @@ function RunPolicy() {
         getAllPolicy();
         //}
         
-        setIsAutoRun(true); //default autorun is true
+        setIsAutoRun(false); //default autorun is true
         console.log("after previous account ==", previousAccountId)
     }, [accountId2])
 
@@ -599,7 +599,7 @@ function RunPolicy() {
             console.log("TIM HIERE ==", data2.isTagge )
             switch(resourcePolicyTypeName ) {
                 case 'Tag':
-                //if (data2.isTagged == false ) {
+                if (data2.isTagged == false ) {
                     resourceList1.push (
                         {
                             resourceId: data2.resourceId,
@@ -613,7 +613,7 @@ function RunPolicy() {
                             costSavings: data2.costSavings
                         }
                     )
-               // }
+                }
 
                 case 'deleted':
                     if (data2.isUderutilitzed == true) {
@@ -1447,9 +1447,9 @@ function RunPolicy() {
                : "" }
 
 
-                <h4>Would you like this policy to run automatically after approval?
+                {/*<h4>Would you like this policy to run automatically after approval?
                 &nbsp; 
-                <Switch checkedChildren="YES" unCheckedChildren="NO" defaultChecked onChange={(e) => setIsAutoRun(e)} /></h4>
+                    <Switch checkedChildren="YES" unCheckedChildren="NO" defaultChecked onChange={(e) => setIsAutoRun(e)} /></h4> */}
                
               
 

@@ -13,6 +13,7 @@ import useEncryptDecrypt from '../../API/useEncryptDescrypt';
 import { EditOutlined, DeleteOutlined, DislikeOutlined, DownOutlined, LikeOutlined, TwoToneColor, getTwoToneColor, setTwoToneColor} from "@ant-design/icons";
 import Approvers from './Approvers';
 import { setGlobalState, useGlobalState} from '../../state2';
+import dateFormat, { masks } from "dateformat";
 
 const columns3X = [
   {
@@ -744,7 +745,7 @@ function PendingApproval () {
         return (
           <>
       
-            {record.isAutoRun == false ?
+            {record.isAutoRun == false && record.status == 3 ? 
             <Button
               onClick={() => {
                 processApprovalManualRun(record, "runmanual");
@@ -808,7 +809,7 @@ function PendingApproval () {
 
     let accountId = getAccountId(currentAccountId, defaultAccountId)
 
-    setLoading(true)
+    setLoading(false)
     console.log("my state  =", data)
 
     let workflowId = data.approvalWorkflowId;
@@ -816,6 +817,7 @@ function PendingApproval () {
     console.log("my workflowId ==", workflowId)    
     console.log("my requestId ==", requestId)    
     
+    console.log("##Time_Start Time =",  new Date().toLocaleString())
     let response = await API.post("/api/Policy/submit", 
     {
       requestId: requestId,
@@ -834,8 +836,11 @@ function PendingApproval () {
         setError(err);
         console.log("Here " + err.response.data)
     }).finally(() => {
-        setLoading(false);
+        //setLoading(false);
     });
+
+    getWorkflowData()
+    console.log("##Time_End Time =",  new Date().toLocaleString())
     console.log("status==", response.data)
 
     console.log("Manual Run ==", JSON.stringify(response.data));
@@ -1265,7 +1270,7 @@ const approvePolicy = async (data,id) => {
 
   /*getWorkflow Datae*/
   const getWorkflowData = async () => {
-    
+    console.log("##Time _ was called inside you know what")
     let accountId = getAccountId(currentAccountId, defaultAccountId)
 
     setLoading(true)
@@ -1300,13 +1305,32 @@ const approvePolicy = async (data,id) => {
       response.data.map((d1, index) =>{
         
         //store approver info in this object 
-        console.log("2original status d1.statusString ", d1.statusString)
-        console.log("2workflow status  d1.workflow.statusString",  d1.statusString)
-        console.log("2resource Id =", d1.resourceId)
-        console.log("2BLA status =", d1.status)
-        console.log("2BLA workflow status =", d1.status)
-        console.log("2BLA workflow status =", d1.statusString + "--- workflowId =" + d1.approvalWorkflowId)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2original status d1.statusString ", d1.statusString)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2workflow status  d1.workflow.statusString",  d1.statusString)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Id =", d1.resourceId)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Name =", d1.resourceName)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA status =", d1.status)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.status)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.statusString + "--- workflowId =" + d1.approvalWorkflowId)
+        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA isAuto Run =", d1.isAutoRun ? "True" : "False" + "--- workflowId =" + d1.approvalWorkflowId + "--- status Id" + d1.status)
+        
+        /* status 1 =
+          status 2 = 
+          status 3 = 
+          status 4
+          status 5
+          status 6 = executed
+          State = completed
+          State = failed
+        */
+
         if (d1.isAutoRun == false && d1.status != 6) {
+          console.log("@@Id =", d1.resourceId)
+          console.log("@@resource name =", d1.resourceName)
+          console.log("@@status=", d1.statusString)
+          console.log("@@workflow Id", d1.approvalWorkflowId)
+          let formattedCreatedDataTime = dateFormat(d1.createdDate, "mmm d, yyyy");
+          console.log("submission_date 1",formattedCreatedDataTime )
           mySubmissionsWorkflowDataIsAutoFalse.push(
             {
               // key: index,
@@ -1335,13 +1359,15 @@ const approvePolicy = async (data,id) => {
               statusString: d1.statusString,
               policyName: d1.policyName,
               resourceName: d1.resourceName,
-              createdDate: d1.createdDate,
+              createdDate: formattedCreatedDataTime, //d1.createdDate,
               requestId: d1.requestId,
               isAutoRun: d1.isAutoRun,
 
             }
           )
         } else {
+          let formattedCreatedDataTime = dateFormat(d1.createdDate, "mmm d, yyyy, h:MM:ss TT");
+          console.log("submission_date 2",formattedCreatedDataTime )
           mySubmissionsWorkflowData.push(
             {
               // key: index,
@@ -1371,7 +1397,7 @@ const approvePolicy = async (data,id) => {
               statusString: d1.statusString,
               policyName: d1.policyName,
               resourceName: d1.resourceName,
-              createdDate: d1.createdDate,
+              createdDate: formattedCreatedDataTime, //d1.createdDate,
               requestId: d1.requestId,
               isAutoRun: d1.isAutoRun,
             }
@@ -1437,7 +1463,8 @@ const approvePolicy = async (data,id) => {
         
 
         console.log("MY INDEX ==", index)
-        if (d1.status== 2 ) {
+        //status 2 = Pending, status 3 = approved, status 4 = rejected
+        if (d1.status== 2 && d1.workflow.status != 4 && d1.workflow.status != 3) {
          
 
           //store approver info in this object 
@@ -1446,6 +1473,7 @@ const approvePolicy = async (data,id) => {
           console.log("2resource Id =", d1.workflow.resourceId)
           console.log("2BLA status =", d1.status)
           console.log("2BLA workflow status =", d1.workflow.status)
+          let formattedCreatedDataTime = dateFormat(d1.workflow.createdDate, "mmm d, yyyy, h:MM:ss TT");
           pendingReviewApprovalData.push(
             {
               key: index,
@@ -1460,7 +1488,7 @@ const approvePolicy = async (data,id) => {
               workflowStatusString: d1.workflow.statusString,
               policyName: d1.workflow.policyName,
               resourceName: d1.workflow.resourceId + " - " + d1.workflow.resourceName,
-              createdDateTime: d1.workflow.createdDate,
+              createdDateTime: formattedCreatedDataTime, //d1.workflow.createdDate,
             }
           )
         }
@@ -1469,6 +1497,7 @@ const approvePolicy = async (data,id) => {
 
         /*all approved */
         if (d1.status== 3 && d1.workflow.status == 3) {
+          let formattedCreatedDataTime = dateFormat(d1.workflow.createdDate, "mmm d, yyyy, h:MM:ss TT");
           pendingFinalApprovalData.push(
             {
               key: index,
@@ -1483,7 +1512,7 @@ const approvePolicy = async (data,id) => {
               workflowStatusString: d1.workflow.statusString,
               policyName: d1.workflow.policyName,
               resourceName: d1.workflow.resourceId + " - " + d1.workflow.resourceName,
-              createdDateTime: d1.workflow.createdDate,
+              createdDateTime: formattedCreatedDataTime, //d1.workflow.createdDate,
             }
           )
         } else if (d1.status > 2 && d1.workflow.status < 3 ) {
@@ -1493,6 +1522,9 @@ const approvePolicy = async (data,id) => {
           console.log("BLA status =", d1.status)
           console.log("BLA workflow status =", d1.workflow.status)
           console.log("MY INDEX ==", index)
+
+          let formattedCreatedDataTime = dateFormat(d1.workflow.createdDate, "mmm d, yyyy, h:MM:ss TT");
+          
           pendingFinalApprovalData.push(
             {
               key: index,
@@ -1507,7 +1539,7 @@ const approvePolicy = async (data,id) => {
               workflowStatusString: d1.workflow.statusString,
               policyName: d1.workflow.policyName,
               resourceName: d1.workflow.resourceId + " - " + d1.workflow.resourceName,
-              createdDateTime: d1.workflow.createdDate,
+              createdDateTime: formattedCreatedDataTime, //d1.workflow.createdDate,
             }
           )
         }
@@ -1885,6 +1917,11 @@ const approvePolicy = async (data,id) => {
                 rowExpandable: record => true,
                 onExpand: fetch,
               }}  
+              rowSelection={{
+                onSelect: (record)=>{
+                  console.log("my record =", {record})
+                }
+              }}
             
             />
         </> : ""}

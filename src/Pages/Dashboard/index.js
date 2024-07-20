@@ -56,6 +56,8 @@ function Dashboard() {
     const currentAccountId = useGlobalState("accountId");
     const currentAccountName = useGlobalState("accountName");
     const defaultAccountId = useGlobalState("defaultAccountId");
+    const [resourceList, setResourceList] = useState([]);
+
 
     //x-API-Key = 8216EB35-BB77-49AD-94CA-A7C3520DC464
     const getEncryption=() => {
@@ -399,85 +401,237 @@ function Dashboard() {
         console.log("metrics=" + JSON.stringify(response.data))
 
     }
+
+      /*use this function to determine when to use the default AccountId or the selected accountId*/
+  function getAccountId(currentAccountId, defaultAccountId) {
+    //const result = Math.floor(Math.random() * number);
+     //setLoading(true)
+     let accountId = null;
+     let myDefaultAccountId = null;
+     let myCurrentAccountId = null;
+     /*if the defaultAccountId is not 0 then use that to pull the metrics else
+     use the value from the dropdown selection*/
+     console.log("BIGcurrent AccountId=", currentAccountId)
+     console.log("BIG default AccountId==", defaultAccountId )
+     
+
+     /*extract defaultAccountId from object*/
+     defaultAccountId.map((d1, key) =>{
+         console.log("BIG my key==", key)
+         if (key == 0){
+             myDefaultAccountId  = d1
+         }
+     })
+
+      /*extract AccountId from object*/
+     currentAccountId.map((d1, key) =>{
+         console.log("BIGmy key==", key)
+         if (key == 0){
+             myCurrentAccountId = d1
+         }
+     })
+
+
+     if (myDefaultAccountId != 0) {
+ 
+         accountId = myDefaultAccountId;
+         console.log("BIG DEFAULT ACCOUNT==", accountId )
+     } else {
+        
+
+         accountId = myCurrentAccountId 
+         console.log("BIG currentAccount==", accountId )
+     }
+    return accountId ;
+  }
+
+    const resourceList1 =[];
     const getMetricsDetails = async (type) => {
-        console.log("metric details was selected")
-        let url = ""
-        if (type == "costSavings") {
-            url = "http://localhost:3000/costSavings"
-        } else {
-            url = "http://localhost:3000/resources"
-        }
+
+
+        let accountId = getAccountId(currentAccountId, defaultAccountId)
+        console.log("@@TYPE == ", type)
         setLoading(true)
-        /*option 3 how to make api cal */
-        let response = await API.get(url
-        ).catch((err) => {
-           setApiResponse(err);
+         /*option 3 how to make api cal */
+       let response =  await API.get("/api/Resource/all/"+accountId+"/0",
+       {
+        headers: {
+          'accept': 'text/plain',
+          'Content-Type': 'application/json',
+          'Authorization': "Bearer " + accessToken,
+          'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+     
+        }
+      },
+       ).catch((err) => {
+            setError(err);
         }).finally(() => {
-           setLoading(false)
+            setLoading(false)
         });
 
 
+
+        //console.log("resourcePolicyTypeName ===", resourcePolicyTypeName )
+        //console.log("resource data =", JSON.stringify(response.data))
+        //change true/false to string for display
+        response.data.forEach((data2, index) => {
+            data2.isTagged ? (console.log("isTagged ==True== ResourceId", data2.resourceId,)) : (console.log("isTagged ==False== ResourceId", data2.resourceId,)) 
+
+            console.log("TIM HIERE ==", data2.isTagge )
+            switch(type) {
+                case 'untagged':
+                if (data2.isTagged == false ) {
+                    
+                    resourceList1.push (
+                        {
+                            resourceId: data2.resourceId,
+                            customerId: data2.customerId,
+                            cloudAccountId: data2.accountId,
+                            resourceName: data2.resourceName,
+                            isTagged: data2.isTagged ? "true" : "false",
+                            isOrphaned: data2.isOrphaned ? "true" : "false",
+                            isUnderutilized:data2.isUnderutilized ? "true" : "false",
+                            statusString: data2.statusString,
+                            resourceType: data2.resourceType,
+                            //costSavings: data2.costSavings
+                        }
+                    )
+
+                    console.log("DOMINIC IGHEDOSA - TAGGED",data2.isTagged ? "true" : "false")
+                }
+                case 'orphan':
+                    if (data2.isOrphaned == true) {
+                        resourceList1.push (
+                            {
+                                resourceId: data2.resourceId,
+                                customerId: data2.customerId,
+                                cloudAccountId: data2.accountId,
+                                resourceName: data2.resourceName,
+                                isTagged: data2.isTagged ? "true" : "false",
+                                isOrphaned: data2.isOrphaned ? "true" : "false",
+                                isUnderutilized:data2.isUnderutilized ? "true" : "false",
+                                statusString: data2.statusString,
+                                resourceType: data2.resourceType,
+                                //costSavings: data2.costSavings
+
+                                
+                            }
+
+
+
+                        )
+                        console.log("DOMINIC IGHEDOSA - ORPHAN ",data2.isOrphaned ? "true" : "false")
+                    }
+
+                
+                case 'lowuse':
+                    if (data2.isUnderutilized == true) {
+                        resourceList1.push (
+                            {
+                                resourceId: data2.resourceId,
+                                customerId: data2.customerId,
+                                cloudAccountId: data2.accountId,
+                                resourceName: data2.resourceName,
+                                isTagged: data2.isTagged ? "true" : "false",
+                                isOrphaned: data2.isOrphaned ? "true" : "false",
+                                isUnderutilized:data2.isUnderutilized ? "true" : "false",
+                                statusString: data2.statusString,
+                                resourceType: data2.resourceType,
+                                //costSavings: data2.costSavings
+
+                                
+                            }
+                        )
+                        console.log("DOMINIC IGHEDOSA - LOW USE",data2.isUnderutilized ? "true" : "false")
+                    }
+
+                default:
+
+            }
+           
+        });
+        //setApiRes(resourceList);
+        //setResourceList(resourceList1);
         
-        console.log("type =" + type)
-        let outputData = "";
-        if(type =="orphan") {
-            outputData = ""
-            outputData = response.data.filter(data => data.isOrphaned === true && data.customerId == customerId );
+        // console.log("metric details was selected")
+        // let url = ""
+        // if (type == "costSavings") {
+        //     url = "http://localhost:3000/costSavings"
+        // } else {
+        //     url = "http://localhost:3000/resources"
+        // }
+        // setLoading(true)
+        // /*option 3 how to make api cal */
+        // let response = await API.get(url
+        // ).catch((err) => {
+        //    setApiResponse(err);
+        // }).finally(() => {
+        //    setLoading(false)
+        // });
+
+
+        
+        // console.log("type =" + type)
+        // let outputData = "";
+        // if(type =="orphan") {
+        //     outputData = ""
+        //     outputData = response.data.filter(data => data.isOrphaned === true && data.customerId == customerId );
 
             
-            console.log("I selected ORPHAN" + JSON.stringify(outputData));
-            setApiRes([]);
-            console.log ("I selected ORPHAN" + JSON.stringify(list))
-        } else if (type =="lowuse") {
-            outputData = ""
-            outputData = response.data.filter(data => data.utilization <= 60 && data.customerId == customerId );
-            console.log("I selected LOWUSE" + JSON.stringify(outputData));
+        //     console.log("I selected ORPHAN" + JSON.stringify(outputData));
+        //     setApiRes([]);
+        //     console.log ("I selected ORPHAN" + JSON.stringify(list))
+        // } else if (type =="lowuse") {
+        //     outputData = ""
+        //     outputData = response.data.filter(data => data.utilization <= 60 && data.customerId == customerId );
+        //     console.log("I selected LOWUSE" + JSON.stringify(outputData));
             
        
-            console.log("low use object =" + JSON.stringify(list))
+        //     console.log("low use object =" + JSON.stringify(list))
             
-        } else if (type == "untagged") {
-            outputData = ""
-            outputData = response.data.filter(data => data.isTagged == false && data.customerId == customerId );
-            console.log("I selected untagged" + JSON.stringify(outputData));
-        } else if (type == "costSavings") {
-            outputData = ""
-            outputData = response.data.filter(data =>  data.customerId == customerId );
-            console.log("I selected costSavings" + JSON.stringify(outputData));
-        }
+        // } else if (type == "untagged") {
+        //     outputData = ""
+        //     outputData = response.data.filter(data => data.isTagged == false && data.customerId == customerId );
+        //     console.log("I selected untagged" + JSON.stringify(outputData));
+        // } else if (type == "costSavings") {
+        //     outputData = ""
+        //     outputData = response.data.filter(data =>  data.customerId == customerId );
+        //     console.log("I selected costSavings" + JSON.stringify(outputData));
+        // }
 
 
-        setApiRes([]);
-        if (type == "costSavings") {
-            outputData.forEach((data2, index) => {
-                list.push (
-                    {
-                        customerId: data2.customerId,
-                        resourceType: data2.resourceType,
-                        costSavings: currencyFormat(data2.costSavings)
-                    }
-                )
-            });
-        } else {
-            outputData.forEach((data2, index) => {
-                list.push (
-                    {
-                        resourceId: data2.resourceId,
-                        customerId: data2.customerId,
-                        cloudAccountId: data2.cloudAccountId,
-                        resourceName: data2.resourceName,
-                        isTagged: data2.isTagged ? "true" : "false",
-                        isOrphaned: data2.isOrphaned ? "true" : "false",
-                        utilization:data2.utilization,
-                        state: data2.state ,
-                        instantType: data2.instantType,
-                        costSavings: data2.costSavings
-                    }
-                )
-            });
-        }
+        // setApiRes([]);
+        // if (type == "costSavings") {
+        //     outputData.forEach((data2, index) => {
+        //         list.push (
+        //             {
+        //                 customerId: data2.customerId,
+        //                 resourceType: data2.resourceType,
+        //                 costSavings: currencyFormat(data2.costSavings)
+        //             }
+        //         )
+        //     });
+        // } else {
+        //     outputData.forEach((data2, index) => {
+        //         list.push (
+        //             {
+        //                 resourceId: data2.resourceId,
+        //                 customerId: data2.customerId,
+        //                 cloudAccountId: data2.cloudAccountId,
+        //                 resourceName: data2.resourceName,
+        //                 isTagged: data2.isTagged ? "true" : "false",
+        //                 isOrphaned: data2.isOrphaned ? "true" : "false",
+        //                 utilization:data2.utilization,
+        //                 state: data2.state ,
+        //                 instantType: data2.instantType,
+        //                 costSavings: data2.costSavings
+        //             }
+        //         )
+        //     });
+        //}
         
-        setApiRes(list)
+        setApiRes(resourceList1)
+        //setApiRes(list)
         // switch(type) {
         //     case 'orphan':
                
@@ -560,6 +714,23 @@ function Dashboard() {
             {/* <br></br>
             <div>{loading? "Loading...": JSON.stringify(apiResponse)}</div> */}
             <Space direction="horizontal">
+            <Link onClick={e => getMetricsDetails("untagged")} >
+                    <DashboardCard 
+                        icon={
+                            <TagOutlined
+                            style={{
+                                color: "green",
+                                backgroundColor: "rgba(0,255,0,0.25)",
+                                borderRadius: 20,
+                                fontSize: 24,
+                                padding: 8,
+                            } }
+                            />
+                        }
+                        title={"Untagged Resources"} 
+                        value={untaggedCount}
+                    />
+                 </Link>
                 <Link onClick={e => {getMetricsDetails("orphan"); getEncryption(); }} >
                     <DashboardCard 
                         icon={
@@ -574,7 +745,7 @@ function Dashboard() {
                             />
                         }
                         title={"Orphan Resources"} 
-                        link={<a href="#">Detail</a>}
+                        //link={<a href="#">Detail</a>}
                         value={orphanCount}
                         
                     />
@@ -598,23 +769,7 @@ function Dashboard() {
                     />
                 </Link>
 
-                <Link onClick={e => getMetricsDetails("untagged")} >
-                    <DashboardCard 
-                        icon={
-                            <TagOutlined
-                            style={{
-                                color: "green",
-                                backgroundColor: "rgba(0,255,0,0.25)",
-                                borderRadius: 20,
-                                fontSize: 24,
-                                padding: 8,
-                            } }
-                            />
-                        }
-                        title={"Untagged Resources"} 
-                        value={untaggedCount}
-                    />
-                 </Link>
+                
 
                 {/* <Link onClick={e => getMetricsDetails("costSavings")} >
                     <DashboardCard 
@@ -640,14 +795,17 @@ function Dashboard() {
             {/* {metricDetails == "" ? <OrphanResources data={apiRes} type={metricDetails} /> : null}
             {metricDetails == "" ? <DashboardChart />: null} */}
 
-               {metricDetails == "orphan" ? <OrphanResources data={apiRes} /> : null}
-               {/* {metricDetails == "orphan" ? <DashboardChart />: null} */}
+              
+              
+
+               {metricDetails == "untagged" ? <UntaggedResources data={apiRes}  /> : null}
+               {/* {metricDetails == "untagged" ? <DashboardChart /> : null} */}
 
                {metricDetails == "lowuse" ? <LowUtilization data={apiRes} /> : null}
                {/* {metricDetails == "lowuse" ? <DashboardChart /> : null} */}
 
-               {metricDetails == "untagged" ? <UntaggedResources data={apiRes}  /> : null}
-               {/* {metricDetails == "untagged" ? <DashboardChart /> : null} */}
+               {metricDetails == "orphan" ? <OrphanResources data={apiRes} /> : null}
+               {/* {metricDetails == "orphan" ? <DashboardChart />: null} */}
 
               {/* {metricDetails == "costSavings" ? <CostSavings data={apiRes} sum={costSavings} /> : null}
               

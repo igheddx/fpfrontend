@@ -27,15 +27,16 @@ function LowUtilization(props) {
             title: "Name",
             dataIndex: "resourceName"
         },
+        {
+            title: "Status",
+            dataIndex: "statusString"
+        },
 
         {
             title: "Type",
-            dataIndex: "instantType"
+            dataIndex: "resourceType"
         },
-        {
-            title: "CustomerId",
-            dataIndex: "customerId"
-        },
+        
         {
             title: "Tagged",
             dataIndex: "isTagged"
@@ -46,7 +47,7 @@ function LowUtilization(props) {
         },
         {
             title: "Use",
-            dataIndex: "utilization"
+            dataIndex: "isUnderutilized"
         }
         
     ]

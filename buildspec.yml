@@ -23,8 +23,8 @@ phases:
 
       #s3://fpfrontends3/178eec96-791b-49e5-b13c-4b734e44362d.gz
       # - sudo scp -r build/* /var/www/html
-
-      - sudo scp -r build/* /var/www/vhosts/frontend/
+      - aws s3 cp s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/ /var/www/vhosts/frontend --recursive
+      #- sudo scp -r build/* /var/www/vhosts/frontend/
 
 artifacts:
   # include all files required to run application

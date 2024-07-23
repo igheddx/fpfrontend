@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+      nodejs: 22
 
     commands:
       # install npm
@@ -24,7 +24,7 @@ phases:
       #s3://fpfrontends3/178eec96-791b-49e5-b13c-4b734e44362d.gz
       # - sudo scp -r build/* /var/www/html
       #- aws s3 cp s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/ /var/www/vhosts/frontend --recursive
-      - aws s3 cp s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/ /fp-dashboard-dev --recursive
+      #- aws s3 cp s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/ /fp-dashboard-dev --recursive
 
       #- sudo scp -r build/* /var/www/vhosts/frontend/
 

@@ -15,7 +15,7 @@ phases:
       - npm run build
 
   post_build:
-    command:
+    commands:
       #- aws s3 cp s3://codepipeline-us-east-1-908788960299/Dev-Pipeline-Finprom/
       #the command below works, but i don't need to get the build file from S3 bucket, it's the build folder o
       #of the project

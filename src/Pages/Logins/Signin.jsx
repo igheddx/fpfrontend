@@ -247,7 +247,7 @@ function Signin() {
             console.error(error);
         }
         */
-        let response =  await axios.post(url+"/api/profile/authenticate",
+        let response =  await axios.post("/api/profile/authenticate",
             {
                 username: username,
                 password: password,

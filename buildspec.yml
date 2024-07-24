@@ -30,7 +30,7 @@ phases:
       #s- aws s3 cp --recursive ./build/ /fp-dashboard-dev/
       #build/ /fp-dashboard-dev --recursive
 
-      - sudo scp -r build/* /var/www/vhosts/frontend/
+      - sudo scp -r ./build/ /var/www/vhosts/frontend/
 
 artifacts:
   # include all files required to run application

@@ -6,7 +6,7 @@ os: linux
 
 files:
   - source: /
-    destination: /fp-dashboard-dev
+    destination: /var/www/vhosts/frontend
     overwrite: true
 
 permissions:

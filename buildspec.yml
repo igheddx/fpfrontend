@@ -26,7 +26,8 @@ phases:
       #- aws s3 cp s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/ /var/www/vhosts/frontend --recursive
       #**
       - aws s3 cp --recursive ./build/ s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/build/
-      - aws s3 cp --recursive s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/build/ /fp-dashboard-dev/
+      #- aws s3 cp --recursive s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/build/ /fp-dashboard-dev/
+      - aws s3 cp --recursive ./build/ /fp-dashboard-dev/
       #build/ /fp-dashboard-dev --recursive
 
       #- sudo scp -r build/* /var/www/vhosts/frontend/

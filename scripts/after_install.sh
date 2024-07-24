@@ -3,8 +3,8 @@
 # navigate to app folder
 cd /fp-dashboard-dev
 
- - aws s3 cp --recursive ./build/ s3://codepipeline-us-east-2-992243525314/fpt-Pipeline/BuildArtif/build/
-sudo cp -r build/* /fp-dashboard-dev
+ - aws s3 cp --recursive ./build/ /fp-dashboard-dev
+#sudo cp -r build/* /fp-dashboard-dev
 # install dependencies
 #sudo npm install
 #sudo npm run build

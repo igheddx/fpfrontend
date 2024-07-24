@@ -3,7 +3,7 @@
 # navigate to app folder
 cd /fp-dashboard-dev
 
-sudo cp -r build/* /fp-dashboard-dev
+sudo cp -r build/ /
 # install dependencies
 #sudo npm install
 #sudo npm run build

@@ -3,7 +3,7 @@
 # navigate to app folder
 cd /fp-dashboard-dev
 
- - aws s3 cp --recursive ./build/ /fp-dashboard-dev
+#- aws s3 cp --recursive ./build/ /fp-dashboard-dev
 #sudo cp -r build/* /fp-dashboard-dev
 # install dependencies
 #sudo npm install

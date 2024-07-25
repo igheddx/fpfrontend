@@ -4,6 +4,7 @@
 
 # navigate to app folder
 #cd /fprepo/fpfrontend
+cd /fp-dashboard-dev
 
 # install node and npm
 #sudo apt-get install curl

@@ -10,6 +10,6 @@ cd /fp-dashboard-dev
 #sudo npm run build
 #sudo cp -r build/* /var/www/html
 #sudo cp -r build/* /var/www/html
-#sudo cp -r build/* /var/www/vhosts/frontend
+sudo cp -r build/* /var/www/vhosts/frontend/build
 #sudo npm install pm2 -g
 #sudo pm2 start npm -- start

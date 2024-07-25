@@ -508,7 +508,7 @@ function Signin() {
 
     
         let profileId = sessionStorage.getItem('profileId')
-        console.log("MY PROFILE == ", profileId)
+        console.log("MY PROFILEE== ", profileId)
         let token = sessionStorage.getItem('accessTokenData')
         console.log("encrypt=", encryptDecryptDataWithUserName)
         console.log("encrypt without username",encryptDecryptDataNoUserName)

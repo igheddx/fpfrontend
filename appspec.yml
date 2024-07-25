@@ -6,7 +6,7 @@ os: linux
 
 files:
   - source: /
-    destination: /var/www/vhosts/frontend
+    destination: /fp-dashboard-dev #/var/www/vhosts/frontend
     overwrite: true
   #file_exists_behavior: OVERWRITE
 permissions:
@@ -16,10 +16,10 @@ permissions:
     group: ec2-user
 
 hooks:
-  # BeforeInstall:
-  #   - location: scripts/before_install.sh
-  #     timeout: 300
-  #     runas: root
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      timeout: 300
+      runas: root
 
   AfterInstall:
     - location: scripts/after_install.sh

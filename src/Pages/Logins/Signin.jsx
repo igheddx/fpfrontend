@@ -74,7 +74,7 @@ function Signin() {
         'accept': 'text/plain',
         'Content-Type': 'application/json',
         //'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
+        'Access-Control-Allow-Origin': 'http://3.142.46.43/',//'http://localhost:3000',
         'Access-Control-Allow-Headers': 'X-Requested-With',
         'Authorization': "Bearer " + token,
         'X-Api-Key': encryptDecryptDataWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
@@ -84,14 +84,14 @@ function Signin() {
 
     //encryption without user name
     const API2 = axios.create({
-        //baseURL: "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
-        baseURl: "http://localhost:3000",
+        baseURL: "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
+        //baseURl: "http://localhost:3000",
         headers: {
+
             'accept': 'text/plain',
             'Content-Type': 'application/json',
-            //'Content-Type': 'application/x-www-form-urlencoded',//'application/json',
-            // 'Access-Control-Allow-Origin': 'http://localhost:3000',
-            // "Access-Control-Allow-Headers": 'X-Requested-With',
+            'Access-Control-Allow-Origin': 'http://3.142.46.43/',//'http://localhost:3000',
+            'Access-Control-Allow-Headers': 'X-Requested-With',
             'Authorization': '',
             'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
     
@@ -247,22 +247,22 @@ function Signin() {
             console.error(error);
         }
         */
-        let response =  await axios.post("/api/profile/authenticate",
+        let response =  await API2.post("/api/profile/authenticate",
             {
                 username: username,
                 password: password,
             },
-            {
-                headers: {
-                    'Accept': 'text/plain',
-                    'Content-Type': 'application/json',
-                    //'Access-Control-Allow-Origin': 'http://localhost:3000',
-                    //'Access-Control-Allow-Headers': 'X-Requested-With',
-                    'Authorization': '',
-                    'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+            // {
+            //     headers: {
+            //         'Accept': 'text/plain',
+            //         'Content-Type': 'application/json',
+            //         //'Access-Control-Allow-Origin': 'http://localhost:3000',
+            //         //'Access-Control-Allow-Headers': 'X-Requested-With',
+            //         'Authorization': '',
+            //         'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
              
-                }
-            },
+            //     }
+            // },
         ).catch((err2) => {
             setError(err2);
         }).finally(() => {
@@ -394,20 +394,20 @@ function Signin() {
         console.log("encrypt no user name", encryptDecryptDataNoUserName)
         setLoading(true)
         console.log("I called the api")
-        let response =  await axios.post("/api/profile/authenticate",
+        let response =  await API2.post("/api/profile/authenticate",
             {
                 username: username,
                 password: password,
             },
-            {
-                headers: {
-                    'Accept': 'text/plain',
-                    'Content-Type': 'application/json',
-                    'Authorization': '',
-                    'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+            // {
+            //     headers: {
+            //         'Accept': 'text/plain',
+            //         'Content-Type': 'application/json',
+            //         'Authorization': '',
+            //         'X-Api-Key': encryptDecryptDataNoUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
              
-                }
-            },
+            //     }
+            // },
         ).catch((err2) => {
             setError(err2);
         }).finally(() => {
@@ -559,7 +559,7 @@ function Signin() {
         }}>
         
         <div className='create'>
-             <h2>Login 2</h2>
+             <h2>Login</h2>
         </div>
         
         <div>

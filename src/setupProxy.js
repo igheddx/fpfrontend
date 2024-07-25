@@ -11,3 +11,4 @@ module.exports = function(app) {
 };
 
 //"proxy": "https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws",
+//https://kee2wx4p2lbovtwqpn5c7urhtq0faonv.lambda-url.us-east-2.on.aws

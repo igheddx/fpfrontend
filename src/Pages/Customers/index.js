@@ -1,6 +1,6 @@
 import { Card, Space, Statistic, Table, Typography, Avatar, Rate } from "antd";
 import {useEffect, useState} from "react";
-import {getCustomers} from "../../API";
+import {getCustomers} from "../../apis";
 
 function Customers() {
 

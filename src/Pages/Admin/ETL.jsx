@@ -1,6 +1,6 @@
 import { Card, Space, Statistic, Table, Typography, Avatar, Rate, Button, Spin, Form, Select, Modal, Alert} from "antd";
 import {useEffect, useState, useContext} from "react";
-import {getInventory} from "../../API";
+import {getInventory} from "../../apis";
 import '../../App.css';
 import Approvers from "../../Components/Approvers/Approvers";
 import Error from "../../Components/Alert/Error";
@@ -11,7 +11,7 @@ import AffectedResources from "../../Components/Approvers/AffectedResources";
 import useBearStore from "../../state/state";
 import useStore from "../../state/state";
 
-import useEncryptDecrypt from '../../API/useEncryptDescrypt';
+import useEncryptDecrypt from '../../apis/useEncryptDescrypt';
 import { responsiveArray } from "antd/es/_util/responsiveObserver";
 import { Context } from '../../Store';
 
@@ -1228,7 +1228,7 @@ function ETL() {
                     width: '100%',
                     
                     }} >
-                   <button class="buttonPrimary" onClick={runETL}>Run Data Import</button>
+                   <button class="buttonPrimary" onClick={runETL}>Refresh Data</button>
                    
                 </Space>
                 </Form>

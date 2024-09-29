@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react'
 import useBearStore from "../../state/state";
 import useStore from "../../state/state";
 
-import useEncryptDecrypt from '../../API/useEncryptDescrypt';
+import useEncryptDecrypt from '../../apis/useEncryptDescrypt';
 
 import axios from "axios";
 import { Navigate, json } from "react-router-dom";
@@ -178,13 +178,13 @@ function Signin() {
         
         
      
-       // console.log("user ==" + JSON.stringify(user))
-        console.log("username =" + username + " passwore =" + password)
+       // console.log("user ==" + JSON.stringifme + " passwore =" + password)
 
-        const profile2 = {
-            firstName: "",
-            lastName: ""
-        }
+        // const profile2 = {y(user))
+        // console.log("username =" + userna
+        //     firstName: "",
+        //     lastName: ""
+        // }
       
     }
 
@@ -368,12 +368,13 @@ function Signin() {
            
 
             
-            console.log("MY IGHEDOSA ROLE =", role)
+            console.log("MY IGHEDOSA ROLE  HERE=", role)
             /*store reusable data in session */
             sessionStorage.setItem("profileData", JSON.stringify(profileData));
             sessionStorage.setItem("roleData", role);
             sessionStorage.setItem("cloundAccountData", JSON.stringify(cloudAccountData));
             
+            console.log("CABALL PROFILE", JSON.stringify(profileData))
             setIsUserValid(true); //temp comment out 11/24
 
             return <Navigate replace to="/" />;     

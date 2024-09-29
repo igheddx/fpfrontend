@@ -9,7 +9,7 @@ import useBearStore from '../../state/state';
 import useStore from "../../state/state";
 import { useState, useEffect, useContext, useRef } from 'react'
 import { Context } from '../../Store';
-import useEncryptDecrypt from '../../API/useEncryptDescrypt';
+import useEncryptDecrypt from '../../apis/useEncryptDescrypt';
 import { EditOutlined, DeleteOutlined, DislikeOutlined, DownOutlined, LikeOutlined, TwoToneColor, getTwoToneColor, setTwoToneColor} from "@ant-design/icons";
 import Approvers from './Approvers';
 import { setGlobalState, useGlobalState} from '../../state2';
@@ -756,6 +756,18 @@ function PendingApproval () {
               Run Policy
               </Button> : "" }
            
+
+
+              {record.isAutoRun == false && record.status == 5 ? 
+            <Button
+              onClick={() => {
+                processApprovalManualRun(record, "runmanual");
+              }}
+              style={{ color: '#29BB89', marginLeft: 12, fontSize: "15px", borderColor: "green" }}
+             
+            >
+              Check Status
+              </Button> : "" }
           </>
         );
       },
@@ -809,13 +821,13 @@ function PendingApproval () {
 
     let accountId = getAccountId(currentAccountId, defaultAccountId)
 
-    setLoading(false)
+    setLoading(true)
     console.log("my state  =", data)
 
     let workflowId = data.approvalWorkflowId;
     let requestId = data.requestId;
-    console.log("my workflowId ==", workflowId)    
-    console.log("my requestId ==", requestId)    
+    console.log("@@@@@@  my workflowId ==", workflowId)    
+    console.log("@@@@@@  my requestId ==", requestId)    
     
     console.log("##Time_Start Time =",  new Date().toLocaleString())
     let response = await API.post("/api/Policy/submit", 
@@ -834,19 +846,26 @@ function PendingApproval () {
     },
     ).catch((err) => {
         setError(err);
-        console.log("Here " + err.response.data)
+        console.log("@@@@@@ Here " + err.response.data)
     }).finally(() => {
         //setLoading(false);
     });
 
     getWorkflowData()
     console.log("##Time_End Time =",  new Date().toLocaleString())
-    console.log("status==", response.data)
+    console.log("@@@@@@ STATUS ==", response.status)
+    console.log("@@@@@@ DATA AFTER SUBMIT ==", response.data)
 
-    console.log("Manual Run ==", JSON.stringify(response.data));
+    console.log("@@@@@@ Manual Run DATA AFTER SUBMIT ==", JSON.stringify(response.data));
 
 
   }
+
+  //check the status of policy run
+  const checkPolicyRunStatus = async (data, type) => {
+
+  }
+
 
   const processApproval  = async (data, type) => {
     showLoader();
@@ -1274,7 +1293,7 @@ const approvePolicy = async (data,id) => {
     let accountId = getAccountId(currentAccountId, defaultAccountId)
 
     setLoading(true)
-    console.log("my state  =", state)
+    console.log("@@@@@@ my state  =", state)
     //let theApprovalId = data.approvalId;
     let mySubmissionsWorkflowData = [];
     let mySubmissionsWorkflowDataIsAutoFalse = []    
@@ -1305,26 +1324,26 @@ const approvePolicy = async (data,id) => {
       response.data.map((d1, index) =>{
         
         //store approver info in this object 
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2original status d1.statusString ", d1.statusString)
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2workflow status  d1.workflow.statusString",  d1.statusString)
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Id =", d1.resourceId)
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Name =", d1.resourceName)
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA status =", d1.status)
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.status)
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.statusString + "--- workflowId =" + d1.approvalWorkflowId)
-        console.log("@BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA isAuto Run =", d1.isAutoRun ? "True" : "False" + "--- workflowId =" + d1.approvalWorkflowId + "--- status Id" + d1.status)
+        console.log("@@@@@@  @BLA-WkFlId=("+d1.approvalWorkflowId+") 2original status d1.statusString ", d1.statusString)
+        console.log("@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2workflow status  d1.workflow.statusString",  d1.statusString)
+        console.log("@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Id =", d1.resourceId)
+        console.log("@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Name =", d1.resourceName)
+        console.log("@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA status =", d1.status)
+        console.log("@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.status)
+        console.log("@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.statusString + "--- workflowId =" + d1.approvalWorkflowId)
+        console.log("@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA isAuto Run =", d1.isAutoRun ? "True" : "False" + "--- workflowId =" + d1.approvalWorkflowId + "--- status Id" + d1.status)
         
         /* status 1 =
-          status 2 = 
-          status 3 = 
+          status 2 = Pending
+          status 3 = approved
           status 4
-          status 5
+          status 5 = Processing
           status 6 = executed
-          State = completed
+          State 8 = completed
           State = failed
         */
 
-        if (d1.isAutoRun == false && d1.status != 6) {
+        if (d1.isAutoRun == false && d1.status != 6 && d1.status !=8 ) {
           console.log("@@Id =", d1.resourceId)
           console.log("@@resource name =", d1.resourceName)
           console.log("@@status=", d1.statusString)
@@ -1366,6 +1385,17 @@ const approvePolicy = async (data,id) => {
             }
           )
         } else {
+
+          console.log("M@@@@@@  @BLA-WkFlId=("+d1.approvalWorkflowId+") 2original status d1.statusString ", d1.statusString)
+        console.log("M@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2workflow status  d1.workflow.statusString",  d1.statusString)
+        console.log("M@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Id =", d1.resourceId)
+        console.log("M@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2resource Name =", d1.resourceName)
+        console.log("M@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA status =", d1.status)
+        console.log("M@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.status)
+        console.log("M@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA workflow status =", d1.statusString + "--- workflowId =" + d1.approvalWorkflowId)
+        console.log("M@@@@@@ @BLA-WkFlId=("+d1.approvalWorkflowId+") 2BLA isAuto Run =", d1.isAutoRun ? "True" : "False" + "--- workflowId =" + d1.approvalWorkflowId + "--- status Id" + d1.status)
+        
+
           let formattedCreatedDataTime = dateFormat(d1.createdDate, "mmm d, yyyy, h:MM:ss TT");
           console.log("submission_date 2",formattedCreatedDataTime )
           mySubmissionsWorkflowData.push(

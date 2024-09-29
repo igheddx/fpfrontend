@@ -3,7 +3,7 @@ import React from 'react'
 import { Form, Button, Checkbox, DatePicker, Input, Select, Space, Typography, Table } from "antd";
 import { useState, useEffect, useContext } from 'react'
 import { Context } from '../../../Store';
-import useEncryptDecrypt from '../../../API/useEncryptDescrypt';
+import useEncryptDecrypt from '../../../apis/useEncryptDescrypt';
 import axios from "axios";
 import useBearStore from "../../../state/state";
 import useStore from "../../../state/state";

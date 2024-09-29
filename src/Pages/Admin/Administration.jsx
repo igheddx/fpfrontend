@@ -10,6 +10,7 @@ import LinkPolicy from './PolicyMgmt/LinkPolicy';
 import SuperAdmin from './SuperAdmin/SuperAdmin';
 import ETL from './ETL'
 import index from './../Logins/index.css'
+import CreatePolicy from './CreatePolicy';
 
 function Administration () {
 
@@ -27,7 +28,7 @@ function Administration () {
     {
       key: 3,
       label: `Create Policy`,
-      children: <PolicyMgmt/>,
+      children: <CreatePolicy/>,
     },
     {
       key: 4,

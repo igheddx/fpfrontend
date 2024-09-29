@@ -88,6 +88,7 @@ const useEncryptDecrypt = () => {
         const final = enc.ciphertext.toString(CryptoJS.enc.Base64);
 
         sessionStorage.setItem('xapikeyNoAccessToken', final)
+        console.log("ENCRYPTED WITH  NO USER NAME", final)
 
         setData(final);
 

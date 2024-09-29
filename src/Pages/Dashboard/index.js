@@ -7,9 +7,10 @@ import {
     ArrowDownOutlined,
     MinusCircleFilled,
   } from "@ant-design/icons";
+  import MetricsCards1 from "../../Components/Metrics/metricsCards1";
   import { Card, Space, Statistic, Table, Typography } from "antd";
   import { useEffect, useState,  useContext } from "react";
-  import { getCustomers, getInventory, getOrders, getRevenue } from "../../API";
+  import { getCustomers, getInventory, getOrders, getRevenue } from "../../apis";
   import { Link } from 'react-router-dom';
   import OrphanResources from "./OrphanResources";
   import LowUtilization from "./LowUtilization";
@@ -20,21 +21,38 @@ import {
   import CryptoJS from 'crypto-js';
   import { Context } from '../../Store';
   import { setGlobalState, useGlobalState} from '../../state2';
+  import ResourceTable
+   from "../../Components/General/ResourceTable";
+  //import useAPI from "../../hooks/useAPI";
+//import useAxios from "../../hooks/useAxios";
+//import fpFrontEnd from "../../apis/fpFrontEnd";
+//import getResources from "../../apis/getResources";
+//import MetricsCards1 from "../../Components/Metrics/MetricsCards1";
 
-  import {
+
+
+import {
     Chart as ChartJS,
     CategoryScale,
+
     LinearScale,
     BarElement,
     Title,
     Tooltip,
     Legend,
     ArcElement,
-  } from "chart.js";
-  import { Bar, Doughnut } from "react-chartjs-2";
+} from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
+import Jokes2 from "../../Components/Jokes2";
+//import MetricsCards1 from "../../Components/Metrics/metricsCards1";
+import Jokes from "../../Components/Jokes";
+//import useAxios from "../../hooks/useAxios";
+//import axiosInstance from "../../services/apiService";
+// import useAxios from "../../hooks/useAPI";
 
 
-  ChartJS.register (
+
+ChartJS.register (
     CategoryScale,
     LinearScale,
     BarElement,
@@ -42,7 +60,7 @@ import {
     Tooltip,
     Legend,
     ArcElement,
-  );
+);
 function Dashboard() {
     const [state, setState] = useContext(Context);
     const [orders, setOrders] = useState(0);
@@ -57,6 +75,16 @@ function Dashboard() {
     const currentAccountName = useGlobalState("accountName");
     const defaultAccountId = useGlobalState("defaultAccountId");
     const [resourceList, setResourceList] = useState([]);
+    const [apiResponse, setApiResponse] = useState({})
+    const [loginAPIResponse, setLoginAPIResponse] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [apikey, setAPIKey] = useState('')
+
+   
+    //const {data1, loading1, error1} = useAPI('/api/Resource/counts/5/40')
+    
+    //const {response1, error1, loading1, status1, fetchData} = useAxios();
+
 
 
     //x-API-Key = 8216EB35-BB77-49AD-94CA-A7C3520DC464
@@ -123,16 +151,14 @@ function Dashboard() {
         //refreshMetrics()
         console.log("default account Me Dashbboard ==", defaultAccountId)
         getMyMetrics();
+        
     }, [currentAccountId])
 
     const handleLinkClick = (card) => {
         console.log('Link clicked' + card);
     };
 
-    const [apiResponse, setApiResponse] = useState({})
-    const [loginAPIResponse, setLoginAPIResponse] = useState(profileData)
-    const [loading, setLoading] = useState(false)
-    const [apikey, setAPIKey] = useState('')
+    
 
 
     const refreshMetrics = () => {
@@ -320,7 +346,7 @@ function Dashboard() {
 
     const getMyMetrics = async () => {
         //console.log("getPoliciesUsingAccountId data =", JSON.stringify())
-        
+      
         let accountId = null;
         let myDefaultAccountId = null;
         let myCurrentAccountId = null;
@@ -361,10 +387,11 @@ function Dashboard() {
         //let params = new URLSearchParams('?accountId='+myCustomerId+'&isActive=true');
         //let params = new URLSearchParams(accountId);
         
-     
+        
+        
         console.log("access toke =", accessToken)
         console.log("xapiKeywithUserNam =", xapiKeyWithUserName)
-        response = await API.get("/api/Resource/counts/"+accountId+"/40", 
+        /*response = await API.get("/api/Resource/counts/"+accountId+"/40", 
         {
             headers: {
               'accept': 'text/plain',
@@ -381,9 +408,9 @@ function Dashboard() {
             console.log("Here " + JSON.stringify(err.response.status))
         }).finally(() => {
             setLoading(false);
-        });
+        }); */
 
-        if (response.status  == 200) {
+       /* if (response.status  == 200) {
             
             let data= response.data
             console.log("isOrphaned===", data.isOrphanedCount)
@@ -395,10 +422,15 @@ function Dashboard() {
             // setApproversData2(null) //clear
             // setApproversData(response.data)
             // setApproversData2(response.data)
-        }
+        }*/
         
 
-        console.log("metrics=" + JSON.stringify(response.data))
+        //console.log("metrics=" + JSON.stringify(data1))
+       
+        // if (response1.status == 200) {
+        //     console.log("NAYLA IGHEDOSA")
+        // }
+            
 
     }
 
@@ -443,12 +475,135 @@ function Dashboard() {
          console.log("BIG currentAccount==", accountId )
      }
     return accountId ;
-  }
-
-    const resourceList1 =[];
-    const getMetricsDetails = async (type) => {
+}
 
 
+
+const fetchPosts = async (id) => {
+    console.log("@@I was called")
+    
+    // setMetricDetails("untagged");
+    // await fetchData ({
+    //     url: "/api/Resource/all/5/0",
+    //     method: "GET",
+    // });
+
+    let accountId = getAccountId(currentAccountId, defaultAccountId)
+    console.log("@@TYPE == ", type)
+    setLoading(true)
+     /*option 3 how to make api cal */
+   let response =  await API.get("/api/Resource/all/"+accountId+"/0",
+   {
+    headers: {
+      'accept': 'text/plain',
+      'Content-Type': 'application/json',
+      'Authorization': "Bearer " + accessToken,
+      'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+ 
+    }
+  },
+   ).catch((err) => {
+        setError(err);
+    }).finally(() => {
+        setLoading(false)
+    }); 
+
+    let type = "untagged"
+    response.forEach((data2, index) => {
+        data2.isTagged ? (console.log("isTagged ==True== ResourceId", data2.resourceId,)) : (console.log("isTagged ==False== ResourceId", data2.resourceId,)) 
+
+        console.log("TIM HIERE ==", data2.isTagge )
+        switch(type) {
+            case 'untagged':
+            if (data2.isTagged == false ) {
+                
+                resourceList1.push (
+                    {
+                        resourceId: data2.resourceId,
+                        customerId: data2.customerId,
+                        cloudAccountId: data2.accountId,
+                        resourceName: data2.resourceName,
+                        isTagged: data2.isTagged ? "true" : "false",
+                        isOrphaned: data2.isOrphaned ? "true" : "false",
+                        isUnderutilized:data2.isUnderutilized ? "true" : "false",
+                        statusString: data2.statusString,
+                        resourceType: data2.resourceType,
+                        //costSavings: data2.costSavings
+                    }
+                )
+
+                console.log("DOMINIC IGHEDOSA - TAGGED",data2.isTagged ? "true" : "false")
+            }
+            case 'orphan':
+                if (data2.isOrphaned == true) {
+                    resourceList1.push (
+                        {
+                            resourceId: data2.resourceId,
+                            customerId: data2.customerId,
+                            cloudAccountId: data2.accountId,
+                            resourceName: data2.resourceName,
+                            isTagged: data2.isTagged ? "true" : "false",
+                            isOrphaned: data2.isOrphaned ? "true" : "false",
+                            isUnderutilized:data2.isUnderutilized ? "true" : "false",
+                            statusString: data2.statusString,
+                            resourceType: data2.resourceType,
+                            //costSavings: data2.costSavings
+
+                            
+                        }
+
+
+
+                    )
+                    console.log("DOMINIC IGHEDOSA - ORPHAN ",data2.isOrphaned ? "true" : "false")
+                }
+
+            
+            case 'lowuse':
+                if (data2.isUnderutilized == true) {
+                    resourceList1.push (
+                        {
+                            resourceId: data2.resourceId,
+                            customerId: data2.customerId,
+                            cloudAccountId: data2.accountId,
+                            resourceName: data2.resourceName,
+                            isTagged: data2.isTagged ? "true" : "false",
+                            isOrphaned: data2.isOrphaned ? "true" : "false",
+                            isUnderutilized:data2.isUnderutilized ? "true" : "false",
+                            statusString: data2.statusString,
+                            resourceType: data2.resourceType,
+                            //costSavings: data2.costSavings
+
+                            
+                        }
+                    )
+                    console.log("DOMINIC IGHEDOSA - LOW USE",data2.isUnderutilized ? "true" : "false")
+                }
+
+            default:
+
+        }
+       
+    });
+
+    setApiRes(resourceList1)
+
+    //setMetricDetails("untagged");
+
+
+       // console.log("ERROR CODE =", status)
+        console .log("NAYLA DATA ==", JSON.stringify(response, null, 2))
+        console .log("NAYLA DATA ERROR ==", error)
+
+  
+}
+
+const resourceList1 =[];
+const getMetricsDetails = async (type) => {
+
+    console.log("@@@Here")
+    //fetchPosts()
+    //nayla is awesome yayy i love papa he is mochi yayyy
         let accountId = getAccountId(currentAccountId, defaultAccountId)
         console.log("@@TYPE == ", type)
         setLoading(true)
@@ -467,14 +622,12 @@ function Dashboard() {
             setError(err);
         }).finally(() => {
             setLoading(false)
-        });
+        }); 
 
 
-
-        //console.log("resourcePolicyTypeName ===", resourcePolicyTypeName )
-        //console.log("resource data =", JSON.stringify(response.data))
-        //change true/false to string for display
-        response.data.forEach((data2, index) => {
+       // fetchPosts(accountId); 
+   
+        response.forEach((data2, index) => {
             data2.isTagged ? (console.log("isTagged ==True== ResourceId", data2.resourceId,)) : (console.log("isTagged ==False== ResourceId", data2.resourceId,)) 
 
             console.log("TIM HIERE ==", data2.isTagge )
@@ -550,126 +703,11 @@ function Dashboard() {
             }
            
         });
-        //setApiRes(resourceList);
-        //setResourceList(resourceList1);
-        
-        // console.log("metric details was selected")
-        // let url = ""
-        // if (type == "costSavings") {
-        //     url = "http://localhost:3000/costSavings"
-        // } else {
-        //     url = "http://localhost:3000/resources"
-        // }
-        // setLoading(true)
-        // /*option 3 how to make api cal */
-        // let response = await API.get(url
-        // ).catch((err) => {
-        //    setApiResponse(err);
-        // }).finally(() => {
-        //    setLoading(false)
-        // });
-
-
-        
-        // console.log("type =" + type)
-        // let outputData = "";
-        // if(type =="orphan") {
-        //     outputData = ""
-        //     outputData = response.data.filter(data => data.isOrphaned === true && data.customerId == customerId );
-
-            
-        //     console.log("I selected ORPHAN" + JSON.stringify(outputData));
-        //     setApiRes([]);
-        //     console.log ("I selected ORPHAN" + JSON.stringify(list))
-        // } else if (type =="lowuse") {
-        //     outputData = ""
-        //     outputData = response.data.filter(data => data.utilization <= 60 && data.customerId == customerId );
-        //     console.log("I selected LOWUSE" + JSON.stringify(outputData));
-            
-       
-        //     console.log("low use object =" + JSON.stringify(list))
-            
-        // } else if (type == "untagged") {
-        //     outputData = ""
-        //     outputData = response.data.filter(data => data.isTagged == false && data.customerId == customerId );
-        //     console.log("I selected untagged" + JSON.stringify(outputData));
-        // } else if (type == "costSavings") {
-        //     outputData = ""
-        //     outputData = response.data.filter(data =>  data.customerId == customerId );
-        //     console.log("I selected costSavings" + JSON.stringify(outputData));
-        // }
-
-
-        // setApiRes([]);
-        // if (type == "costSavings") {
-        //     outputData.forEach((data2, index) => {
-        //         list.push (
-        //             {
-        //                 customerId: data2.customerId,
-        //                 resourceType: data2.resourceType,
-        //                 costSavings: currencyFormat(data2.costSavings)
-        //             }
-        //         )
-        //     });
-        // } else {
-        //     outputData.forEach((data2, index) => {
-        //         list.push (
-        //             {
-        //                 resourceId: data2.resourceId,
-        //                 customerId: data2.customerId,
-        //                 cloudAccountId: data2.cloudAccountId,
-        //                 resourceName: data2.resourceName,
-        //                 isTagged: data2.isTagged ? "true" : "false",
-        //                 isOrphaned: data2.isOrphaned ? "true" : "false",
-        //                 utilization:data2.utilization,
-        //                 state: data2.state ,
-        //                 instantType: data2.instantType,
-        //                 costSavings: data2.costSavings
-        //             }
-        //         )
-        //     });
-        //}
-        
+   
         setApiRes(resourceList1)
-        //setApiRes(list)
-        // switch(type) {
-        //     case 'orphan':
-               
-        //        console.log("INSIDE ORPHAN")
-        //     case 'lowuse':
-        //        outputData = response.data.filter(data => data.utilization <= 60  && data.customerId == state.customerId );
-        //         console.log("INSIDE LOW USE")
-        //     default:
-        //         null
-        //         // outputData = response.data.filter(data => data.isOrphaned === true && data.customerId == state.customerId );
-        //   }
-
-        //console.log("Metrics Details am here " + JSON.stringify(outputData))
-        
-
-      
 
         setMetricDetails(type);
-        //setMetricDetails("orphan");
-        //console.log("outputData == "+ outputData)
-        // const resourceData  =  outputData.map((data2)=> {
-        //     resources.resourceId = data2.resourceId
-        //     resources.customerId = data2.customerId
-        //     resources.cloudAccountId = data2.cloudAccountId
-        //     resources.resourceName = data2.resourceName
-        //     resources.isTagged = data2.isTagged ? "true" : "false"
-        //     resources.isOrphaned = data2.isOrphaned ? "true" : "false"
-        //     resources.utilization = data2.utilization
-        //     resources.state = data2.state 
-        //     resources.instantType = data2.instantType
-        //     resources.costSavings = data2.costSavings
-            
-        // });
-
-        //console.log(resourceData)
-       
-       // console.log("Metrics Details am here " + list)
-        
+  
     }
 
 
@@ -706,15 +744,19 @@ function Dashboard() {
 
         <Space size={2} direction="vertical">
             <Typography.Title level={4}>Dashboard</Typography.Title>
-     
-        
+            <MetricsCards1 />
+
             {/* {"login response data  == " + loginAPIResponse.firstName + "   " + loginAPIResponse.email}
             <br></br>
             {"APIv Keyv==  " + apikey} */}
             {/* <br></br>
             <div>{loading? "Loading...": JSON.stringify(apiResponse)}</div> */}
-            <Space direction="horizontal">
-            <Link onClick={e => getMetricsDetails("untagged")} >
+            {/*<Space direction="horizontal">
+
+           
+
+            <Link onClick={e => {getMetricsDetails("orphan"); getEncryption(); }} > 
+                  
                     <DashboardCard 
                         icon={
                             <TagOutlined
@@ -787,18 +829,20 @@ function Dashboard() {
                         title={"Cost Savings"} 
                         value={costSavings}
                     />
-                </Link> */}
+                </Link> 
     
             </Space>
-            <Space>
+            <Space> 
           
             {/* {metricDetails == "" ? <OrphanResources data={apiRes} type={metricDetails} /> : null}
             {metricDetails == "" ? <DashboardChart />: null} */}
 
               
               
+              {loading && <p>Loading...</p>}
 
-               {metricDetails == "untagged" ? <UntaggedResources data={apiRes}  /> : null}
+                { metricDetails == "untagged" ? <UntaggedResources data={apiRes}  /> : null}
+               {/*metricDetails == "untagged" ? <UntaggedResources data={apiRes}  /> : null}
                {/* {metricDetails == "untagged" ? <DashboardChart /> : null} */}
 
                {metricDetails == "lowuse" ? <LowUtilization data={apiRes} /> : null}
@@ -820,7 +864,7 @@ function Dashboard() {
                 {metricDetails == "costSavings" ? <CostSavingsDonutChart /> : null}</div> */}
                 
             </Space>
-        </Space>
+        
         </>
     );
 }

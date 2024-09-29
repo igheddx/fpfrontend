@@ -1,11 +1,11 @@
 import React from 'react';
 import { Form, Button, Checkbox, DatePicker, Input, Select, Space, Spin, Typography, Alert, Flex, Cascader, InputNumber, Mentions, TreeSelect, InputNumbers} from "antd";
 import { useState, useEffect, useContext } from 'react'
-import { Context } from '../../../Store';
-import useEncryptDecrypt from '../../../apis/useEncryptDescrypt';
+import { Context } from '../../Store';
+import useEncryptDecrypt from '../../apis/useEncryptDescrypt';
 import axios from "axios";
-import useBearStore from "../../../state/state";
-import useStore from "../../../state/state";
+import useBearStore from "../../state/state";
+import useStore from "../../state/state";
 import { runes } from 'runes2';
   
 
@@ -32,7 +32,7 @@ const formItemLayout = {
   },
 };
 
-function Registration() {
+function CreatePolicy() {
 
   const [form] = Form.useForm();
 
@@ -51,7 +51,10 @@ function Registration() {
   const [state, setState] = useContext(Context);
   const [resCode, setResCode] = useState(0);
   const [isUpdateSuccess, setIsUpdateSuccess] = useState(false);
-  
+  const [policyType, setPolicyType] = useState([])
+  const [policyTypeId, setPolicyTypeId] = useState();
+
+  const [xApiKeyWithUserName1, setXapiKeyWithUserName1] = useState('')
   /*declare state variables*/
   const [availableCloudAccounts, setAvailableCloudAccounts] = useState([]);
   const [xapikeyNoAccessToken, setXapiKeyNoAccessToken] = useState('')
@@ -59,16 +62,22 @@ function Registration() {
 
   //let accountsData = []
   let accessToken = sessionStorage.getItem('accessTokenData')
+  let xapiKeyWithUserName = sessionStorage.getItem('xapikey')
+
   useEffect(() => {
 
-    /*get clound account list*/
-    let accountsData = sessionStorage.getItem('cloundAccountData')
-    accountsData = JSON.parse(accountsData)
-    setAvailableCloudAccounts(accountsData)
-    
-    let xapikeyNoAccessToken = sessionStorage.getItem('xapikeyNoAccessToken')
-    setXapiKeyNoAccessToken(xapikeyNoAccessToken)
+     /*get clound account list*/
+     let accountsData = sessionStorage.getItem('cloundAccountData')
+     accountsData = JSON.parse(accountsData)
+     setAvailableCloudAccounts(accountsData)
+     
+     let xapikeyNoAccessToken = sessionStorage.getItem('xapikeyNoAccessToken')
+     setXapiKeyNoAccessToken(xapikeyNoAccessToken)
 
+     let xapiKeyWithUserName = sessionStorage.getItem('xapikey')
+     setXapiKeyWithUserName1(xapiKeyWithUserName)
+
+    getPolicyType();
 
 },[]);
 
@@ -106,6 +115,42 @@ function Registration() {
       (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
   }
+
+
+
+  /*get policyType */
+  const getPolicyType = async () => {
+    
+
+    setLoading(true)
+    //let response = await API.get('/api/Policy/types')
+    let response = await API.get('/api/Policy/types',
+    {
+      headers: {
+        'accept': 'text/plain',
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + accessToken,
+        'X-Api-Key': xapiKeyWithUserName, //'uKxGOdeVGpNxWRbRH9qofN21kQDht4FrpsqIaMcaamdyLGFeg3MvoZiBwOQ6OO7n',
+   
+      }
+    },
+    
+    ).catch((err) => {
+    // setError(response2.error);
+    console.log("there is failure", JSON.stringify(err))
+    // console.log("Here " + JSON.stringify(err.response.status))
+    }).finally(() => {
+    setLoading(false);
+    });
+
+    if (response.status == 200) {
+        setPolicyType(response.data)
+    }
+    console.log("policy type ||||", JSON.stringify(response.data))
+}
+
+
+
 
 
   const API = axios.create({
@@ -225,48 +270,63 @@ function Registration() {
 
   }
   
-  const createProfile2 = async (profile) => {
+  /*create polic*/
+  const createPolicy = async (policy) => {
    
-      let profileData = {
-        firstName: profile.firstName,
-        lastName:  profile.lastName,
-        username: profile.email,
-        password: profile.password,
-        email: profile.email,
-        accountId: profile.cloudId,
-        roleId: profile.role,
-        phone: "+1800-123-43537",
-        businessUnitId: "IT"
-      }
-     
-
-      console.log("API key ==", xapikeyNoAccessToken,)
-      console.log("refresh token", accessToken)
-      console.log("first name = " + firstName)
-      console.log("last name = " + lastName)
-      console.log("email = " + email)
-      
-      console.log("ROLE = " + role)
-      console.log("cloudId = " + cloudId)
+    //   let profileData = {
+    //     firstName: profile.firstName,
+    //     lastName:  profile.lastName,
+    //     username: profile.email,
+    //     password: profile.password,
+    //     email: profile.email,
+    //     accountId: profile.cloudId,
+    //     roleId: profile.role,
+    //     phone: "+1800-123-43537",
+    //     businessUnitId: "IT"
+    //   }
+    
+    let policyName = policy.policyDisplayName.replace(/\s/g, "-"); //remove space
   
+    let policyData = {
+        displayName: policy.policyDisplayName,
+        type: policy.policyType,
+        accountId: policy.cloudId,
+        name: policyName,
+        tagName: "tagName",
+        tagValue: policy.tagValue,
+    }
+
+    
+    console.log("#@#Oru Data =", policyData)
+    console.log("#@#policName =", policyName)
+    console.log("#@#AccessToken =", accessToken)
+    console.log("#@#xAPI-key =",  xapiKeyWithUserName)
+    
       setLoading(true)
-      let response = await API.post('/api/profile/register', profileData,
+      let response = await API.post('/api/Policy/createtag', policyData,
       {
           headers: {
               'Accept': 'text/plain',
               'Content-Type': 'application/json',
-              'Authorization': accessToken,
-              'X-Api-Key': xapikeyNoAccessToken,
+              'Authorization': "Bearer " + accessToken,
+              'X-Api-Key': xapiKeyWithUserName,
        
           }
       },
       
       ).catch((err) => {
-          setRegisterProfile(err);
+          setError(err);
           console.log("failed status == " + JSON.stringify(err.response.data));
       }).finally(() => {
           setLoading(false)
       });
+  
+      if (response.status == 200) {
+        
+      } else {
+        console.log("something went wrong")
+      }
+    
       
 
       setResCode(response.status)
@@ -344,9 +404,9 @@ function Registration() {
       
     >
 
-    <Typography.Title level={5}>Create Profile  </Typography.Title>
+    <Typography.Title level={5}>Create Policy </Typography.Title>
         {isUpdateSuccess ==true ? 
-                <><Alert message="Profile was successfully created." type="success" /> <br></br></>: "" }
+                <><Alert message="Policy was successfully created." type="success" /> <br></br></>: "" }
 
         {loading && 
           <Spin tip="Processing, please wait" size="small">
@@ -373,7 +433,7 @@ function Registration() {
         wrapperCol={{span: 14}}
         form={form}
         autoComplete="off"
-        onFinish={(values) => {createProfile2(values);
+        onFinish={(values) => {createPolicy(values);
         }}
         onFinishFailed={(error) => {
         console.log({ error });
@@ -381,56 +441,77 @@ function Registration() {
     >
     
     <Form.Item
-      label="First Name:"
-      name="firstName"
+      label="Policy Name:"
+      name="policyDisplayName"
       
       rules={[
         {
           required: true,
-          message: 'Please enter first name!',
+          message: 'Please enter policy name!',
         },
         { whitespace: true },
         { min: 3 },
       ]}
       hasFeedback
     >
-      <Input placeholder= "Enter First Name" prefix={<UserOutlined className="site-form-item-icon" />}/>
+      <Input placeholder= "Policy Name" />
+    </Form.Item>
+    
+    
+
+    <Form.Item 
+        name="policyType" 
+        label="Policy Type" 
+        requiredMark="optional">
+            <Select 
+            
+                placeholder="Select policy type"
+                onChange={e => setPolicyTypeId(e)}
+                
+              >
+               {policyType.map((type, key) => { 
+                    return  <Select.Option value={type.policyTypeId} key={key} >{type.name}</Select.Option>
+                
+                })}
+          </Select>
+            
     </Form.Item>
 
-    <Form.Item
-      label="Last Name:"
-      name="lastName"
+    {/* <Form.Item
+      label="Tag Name:"
+      name="tagName"
       
       rules={[
         {
           required: true,
-          message: 'Please enter last name!',
+          message: 'Please enter tag name!',
         },
         { whitespace: true },
         { min: 3 },
       ]}
       hasFeedback
     >
-      <Input placeholder= "Enter Last Name" prefix={<UserOutlined className="site-form-item-icon" />} />
-    </Form.Item>
+      <Input placeholder= "Tag Name" prefix={<UserOutlined className="site-form-item-icon" />}/>
+    </Form.Item> */}
 
     <Form.Item
-      label="Email:"
-      name="email"
+      label="Tag Value:"
+      name="tagValue"
       
       rules={[
         {
           required: true,
-          message: 'Please enter email!',
+          message: 'Please enter tag value!',
         },
-
-        {type: "email", message: "Please enter a valid email"},
-       
+        { whitespace: true },
+        { min: 3 },
       ]}
       hasFeedback
     >
-      <Input placeholder= "Enter Email" prefix={<MailOutlined className="site-form-item-icon" />} />
+      <Input placeholder= "Tag Value" />
     </Form.Item>
+
+
 
     <Form.Item 
       name="cloudId"  
@@ -453,48 +534,7 @@ function Registration() {
           </Select>
     </Form.Item>
     
-    <Form.Item 
-      name="role"  
-      label="Role:"
-      rules={[
-        {
-          required: true,
-          message: 'Please select a role!',
-        },
-      ]}
-      >
-        <Select 
-        
-            placeholder="Select role"
-            onChange={e => setRole(e)}
-            
-          >
-            {accountRoles.map((role, key) => { 
-                return  <Select.Option value={role.id} key={key} >{role.label}</Select.Option>
-            
-            })}
-      </Select>
-            
-    </Form.Item>
-          
-    <Form.Item
-      label="Temporary Password:"
-      name="password"
-      
-      rules={[
-        {
-          required: true,
-          message: 'Please enter password!',
-        },
-        { whitespace: true },
-        { min: 5 },
-      ]}
-      hasFeedback
-    >
-      <Input placeholder= "Enter temporary password" style={{
-          width: '100%',
-        }} prefix={<LockOutlined className="site-form-item-icon" />}/>
-    </Form.Item>
+   
    
     <Form.Item
     
@@ -519,7 +559,7 @@ function Registration() {
           }
         }
       >
-        Create Profile
+        Create Policy
       </Button>
     </Form.Item>
   </Form>
@@ -530,4 +570,4 @@ function Registration() {
   );
 }
 
-export default Registration;
+export default CreatePolicy;

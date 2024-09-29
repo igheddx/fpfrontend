@@ -10,6 +10,8 @@ import useBearStore from "../src/state/state";
 import Login1 from "./Pages/Logins/Login1";
 import Signin from './Pages/Logins/Signin';
 import Store from './Store';
+import Jokes from "./Components/Jokes";
+import Jokes2 from "./Components/Jokes2";
 function App() {
   
 
@@ -33,6 +35,7 @@ function App() {
     </Store>
   ) : (
     <Store>
+         {/* this example of self-contain component w/ API serivce call <Jokes /> */}
     <div className="App">
     <Signin/>
     

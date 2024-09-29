@@ -1,6 +1,6 @@
 import { Card, Space, Statistic, Table, Typography, Radio, RadioChangeEvent, Avatar, Switch, Rate, Button, Form, Select, Spin, Modal, Alert} from "antd";
 import {useEffect, useState, useContext, useRef} from "react";
-import {getInventory} from "../../API";
+import {getInventory} from "../../apis";
 import '../../App.css';
 import Approvers from "../../Components/Approvers/Approvers";
 import Error from "../../Components/Alert/Error";
@@ -11,7 +11,7 @@ import AffectedResources from "../../Components/Approvers/AffectedResources";
 import useBearStore from "../../state/state";
 import useStore from "../../state/state";
 
-import useEncryptDecrypt from '../../API/useEncryptDescrypt';
+import useEncryptDecrypt from '../../apis/useEncryptDescrypt';
 import { responsiveArray } from "antd/es/_util/responsiveObserver";
 import { Context } from '../../Store';
 
@@ -231,7 +231,7 @@ function RunPolicy() {
         console.log("my approver =" + JSON.stringify(response.data))
     }
 
-   const resourceList1 =[];
+    const resourceList1 =[];
     const getResourcesAffected = async (policyType) => {
 
         let qryString =""
@@ -569,7 +569,7 @@ function RunPolicy() {
 
         setLoading(true)
          /*option 3 how to make api cal */
-       let response =  await API.get("/api/Resource/all/"+accountId+"/"+resourcePolicyTypeId,
+       let response =  await API.get("/api/Resource/all/"+accountId+"/0",
        {
         headers: {
           'accept': 'text/plain',
@@ -1323,7 +1323,7 @@ function RunPolicy() {
        
         <Space size={20} direction="vertical" >
            <Typography.Title level={4} >Run Policy</Typography.Title>
-            Auto value = {isAutoRun == true ? "true" : "false"}
+            {/*Auto value = {isAutoRun == true ? "true" : "false"}*/}
            {/* {loading == true ?
                 <>
                 <Spin tip="Processing...please wait" size="large">
@@ -1332,9 +1332,9 @@ function RunPolicy() {
                 
                 </> : ""
             } */}
+            
+
             <Spin spinning={loading} fullscreen />
-
-
 
             {isUpdateSuccess ==true ? 
                 <Alert message={message} type="success" style={{width:'500px'}} /> : "" }
